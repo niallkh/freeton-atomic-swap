@@ -1,0 +1,10 @@
+{
+  "url":"net.ton.dev",
+  "wc":0,
+  "addr":null,
+  "wallet":null,
+  "abi_path":null,
+  "keys_path":"./Wallet.keys.json",
+  "retries":5,
+  "timeout":60000
+}
