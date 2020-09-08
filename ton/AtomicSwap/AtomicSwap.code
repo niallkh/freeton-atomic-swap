@@ -1,0 +1,841 @@
+.globl	constructor
+.public	constructor
+.type	constructor, @function
+GETGLOB 1
+ISNULL
+PUSHCONT {
+	CALL $c4_to_c7_with_init_storage$
+}
+IF
+;; constructor protection
+GETGLOB 6
+THROWIF 51
+PUSHINT 1
+SETGLOB 6
+;; end constructor protection
+; Decode input parameters
+; Decode _participant
+LDMSGADDR
+; Decode _amount
+LDUQ 128
+PUSHCONT {
+	;; load next cell
+	LDREF
+	ENDS
+	CTOS
+	LDU 128
+}
+IFNOT
+; Decode _time
+LDUQ 256
+PUSHCONT {
+	;; load next cell
+	LDREF
+	ENDS
+	CTOS
+	LDU 256
+}
+IFNOT
+ENDS
+;; param: _participant
+;; param: _amount
+;; param: _time
+; constructor AtomicSwap
+;; !
+;; address.isNone()
+;; get member sender
+GETGLOB 9
+PUSHSLICE x2_
+SDEQ
+NOT
+THROWIFNOT 400
+;; !
+;; address.isNone()
+;; push identifier _participant
+PUSH S2
+PUSHSLICE x2_
+SDEQ
+NOT
+THROWIFNOT 400
+;; push identifier _time
+DUP
+GTINT 0
+;; short-circuiting ||
+DUP
+PUSHCONT {
+	DROP
+	;; push identifier _time
+	DUP
+	PUSHINT 315360001
+	;; <=
+	LEQ
+}
+IFNOT
+THROWIFNOT 400
+;; get member value
+CALL $message_balance_macro$
+;; push identifier amount
+GETGLOB 13
+;; >=
+GEQ
+THROWIFNOT 400
+; expValue
+; end expValue
+;; push identifier owner
+GETGLOB 10
+; colValue
+SETGLOB 10
+; end colValue
+; expValue
+; end expValue
+;; push identifier _participant
+PUSH S2
+; colValue
+SETGLOB 11
+; end colValue
+; expValue
+; end expValue
+;; push identifier _amount
+PUSH S1
+; colValue
+SETGLOB 13
+; end colValue
+; expValue
+; end expValue
+;; push identifier now
+NOW
+;; push identifier _time
+PUSH S1
+;; +
+ADD
+; colValue
+SETGLOB 12
+; end colValue
+BLKDROP 3
+; end constructor AtomicSwap
+CALL $c7_to_c4$
+TRUE
+SETGLOB 7
+
+.globl	redeem
+.public	redeem
+.type	redeem, @function
+GETGLOB 1
+ISNULL
+PUSHCONT {
+	CALL $c4_to_c7$
+}
+IF
+; Decode input parameters
+; Decode secret
+LDU 256
+ENDS
+;; param: secret
+; modifier onlyParticipant
+;; get member sender
+GETGLOB 9
+;; push identifier participant
+GETGLOB 11
+SDEQ
+THROWIFNOT 400
+; modifier whenNotExpired
+;; push identifier now
+NOW
+;; push identifier expired_time
+GETGLOB 12
+;; <
+LESS
+THROWIFNOT 400
+; function redeem
+;; get member balance
+GETPARAM 7
+INDEX 0
+;; push identifier amount
+GETGLOB 13
+;; >=
+GEQ
+THROWIFNOT 400
+NEWC
+;; push identifier secret
+PUSH S1
+STUR 256
+ENDC
+CTOS
+SHA256U
+;; uint256
+UFITS 256
+;; decl: computed_hash
+;; push identifier computed_hash
+DUP
+;; push identifier secret_hash
+GETGLOB 14
+;; ==
+EQUAL
+THROWIFNOT 400
+;; transfer()
+;; push identifier amount
+GETGLOB 13
+;; push identifier participant
+GETGLOB 11
+NEWC
+STSLICECONST x62_
+STSLICE
+SWAP
+STGRAMS
+PUSHINT 105
+STZEROES
+STSLICECONST 0
+STSLICECONST 0
+ENDC
+PUSHINT 1
+SENDRAWMSG
+;; emit Redeemed
+NEWC
+PUSHSLICE xc0000000000000000000000002_
+STSLICER
+STSLICECONST 0
+STSLICECONST 0
+STSLICECONST x1eb5cab6
+;; secret
+;; push identifier secret
+PUSH S2
+STUR 256
+;; addr
+;; push identifier participant
+GETGLOB 11
+STSLICER
+;; time
+;; push identifier now
+NOW
+STUR 256
+ENDC
+PUSHINT 1
+SENDRAWMSG
+;; push identifier owner
+GETGLOB 10
+NEWC
+STSLICECONST x42_
+STSLICE
+PUSHSLICE x203e8000000000000000000000000004_
+STSLICER
+STSLICECONST 0
+STSLICECONST 0
+ENDC
+PUSHINT 160
+SENDRAWMSG
+DROP
+; end function redeem
+; end modifier whenNotExpired
+DROP
+; end modifier onlyParticipant
+CALL $c7_to_c4$
+TRUE
+SETGLOB 7
+
+.globl	redeem_internal
+.type	redeem_internal, @function
+;; param: secret
+; modifier onlyParticipant
+;; get member sender
+GETGLOB 9
+;; push identifier participant
+GETGLOB 11
+SDEQ
+THROWIFNOT 400
+; modifier whenNotExpired
+;; push identifier now
+NOW
+;; push identifier expired_time
+GETGLOB 12
+;; <
+LESS
+THROWIFNOT 400
+; function redeem
+;; get member balance
+GETPARAM 7
+INDEX 0
+;; push identifier amount
+GETGLOB 13
+;; >=
+GEQ
+THROWIFNOT 400
+NEWC
+;; push identifier secret
+PUSH S1
+STUR 256
+ENDC
+CTOS
+SHA256U
+;; uint256
+UFITS 256
+;; decl: computed_hash
+;; push identifier computed_hash
+DUP
+;; push identifier secret_hash
+GETGLOB 14
+;; ==
+EQUAL
+THROWIFNOT 400
+;; transfer()
+;; push identifier amount
+GETGLOB 13
+;; push identifier participant
+GETGLOB 11
+NEWC
+STSLICECONST x62_
+STSLICE
+SWAP
+STGRAMS
+PUSHINT 105
+STZEROES
+STSLICECONST 0
+STSLICECONST 0
+ENDC
+PUSHINT 1
+SENDRAWMSG
+;; emit Redeemed
+NEWC
+PUSHSLICE xc0000000000000000000000002_
+STSLICER
+STSLICECONST 0
+STSLICECONST 0
+STSLICECONST x1eb5cab6
+;; secret
+;; push identifier secret
+PUSH S2
+STUR 256
+;; addr
+;; push identifier participant
+GETGLOB 11
+STSLICER
+;; time
+;; push identifier now
+NOW
+STUR 256
+ENDC
+PUSHINT 1
+SENDRAWMSG
+;; push identifier owner
+GETGLOB 10
+NEWC
+STSLICECONST x42_
+STSLICE
+PUSHSLICE x203e8000000000000000000000000004_
+STSLICER
+STSLICECONST 0
+STSLICECONST 0
+ENDC
+PUSHINT 160
+SENDRAWMSG
+DROP
+; end function redeem
+; end modifier whenNotExpired
+DROP
+; end modifier onlyParticipant
+
+.globl	refund
+.public	refund
+.type	refund, @function
+GETGLOB 1
+ISNULL
+PUSHCONT {
+	CALL $c4_to_c7$
+}
+IF
+; Decode input parameters
+ENDS
+; modifier onlyOwner
+;; get member sender
+GETGLOB 9
+;; push identifier owner
+GETGLOB 10
+SDEQ
+THROWIFNOT 400
+; modifier whenExpired
+;; push identifier now
+NOW
+;; push identifier expired_time
+GETGLOB 12
+;; >=
+GEQ
+THROWIFNOT 400
+; function refund
+;; emit Refunded
+NEWC
+PUSHSLICE xc0000000000000000000000002_
+STSLICER
+STSLICECONST 0
+STSLICECONST 0
+STSLICECONST x5b684ed6
+;; addr
+;; push identifier owner
+GETGLOB 10
+STSLICER
+;; time
+;; push identifier now
+NOW
+STUR 256
+ENDC
+PUSHINT 1
+SENDRAWMSG
+;; push identifier owner
+GETGLOB 10
+NEWC
+STSLICECONST x42_
+STSLICE
+PUSHSLICE x203e8000000000000000000000000004_
+STSLICER
+STSLICECONST 0
+STSLICECONST 0
+ENDC
+PUSHINT 160
+SENDRAWMSG
+; end function refund
+; end modifier whenExpired
+; end modifier onlyOwner
+CALL $c7_to_c4$
+TRUE
+SETGLOB 7
+
+.globl	refund_internal
+.type	refund_internal, @function
+; modifier onlyOwner
+;; get member sender
+GETGLOB 9
+;; push identifier owner
+GETGLOB 10
+SDEQ
+THROWIFNOT 400
+; modifier whenExpired
+;; push identifier now
+NOW
+;; push identifier expired_time
+GETGLOB 12
+;; >=
+GEQ
+THROWIFNOT 400
+; function refund
+;; emit Refunded
+NEWC
+PUSHSLICE xc0000000000000000000000002_
+STSLICER
+STSLICECONST 0
+STSLICECONST 0
+STSLICECONST x5b684ed6
+;; addr
+;; push identifier owner
+GETGLOB 10
+STSLICER
+;; time
+;; push identifier now
+NOW
+STUR 256
+ENDC
+PUSHINT 1
+SENDRAWMSG
+;; push identifier owner
+GETGLOB 10
+NEWC
+STSLICECONST x42_
+STSLICE
+PUSHSLICE x203e8000000000000000000000000004_
+STSLICER
+STSLICECONST 0
+STSLICECONST 0
+ENDC
+PUSHINT 160
+SENDRAWMSG
+; end function refund
+; end modifier whenExpired
+; end modifier onlyOwner
+
+.globl	params
+.public	params
+.type	params, @function
+GETGLOB 1
+ISNULL
+PUSHCONT {
+	CALL $c4_to_c7$
+}
+IF
+; Decode input parameters
+ENDS
+; function params
+;; ret param: _owner
+PUSHSLICE x8000000000000000000000000000000000000000000000000000000000000000001_
+;; ret param: _participant
+PUSHSLICE x8000000000000000000000000000000000000000000000000000000000000000001_
+;; ret param: _expired_time
+PUSHINT 0
+;; ret param: _secret_hash
+PUSHINT 0
+;; ret param: _amount
+PUSHINT 0
+;; ret param: _balance
+PUSHINT 0
+; expValue
+; end expValue
+;; push identifier owner
+GETGLOB 10
+; colValue
+POP s6
+; end colValue
+; expValue
+; end expValue
+;; push identifier participant
+GETGLOB 11
+; colValue
+POP s5
+; end colValue
+; expValue
+; end expValue
+;; push identifier expired_time
+GETGLOB 12
+; colValue
+POP s4
+; end colValue
+; expValue
+; end expValue
+;; push identifier secret_hash
+GETGLOB 14
+; colValue
+POP s3
+; end colValue
+; expValue
+; end expValue
+;; push identifier amount
+GETGLOB 13
+; colValue
+POP s2
+; end colValue
+;; get member balance
+GETPARAM 7
+INDEX 0
+; expValue
+; end expValue
+; colValue
+NIP
+; end colValue
+;; returning named params
+;; emitting 6 value(s)
+PUSH S6
+EQINT -1
+PUSHCONT {
+	PUSH S8
+	CTOS
+	LDU 2
+	LDMSGADDR
+	DROP
+	NIP
+	NEWC
+	STSLICECONST xc
+	STSLICE
+	PUSHINT 96
+	STZEROES
+	STSLICECONST 0
+	STSLICECONST 1
+	NEWC
+	STSLICECONST xf44dbe53
+	PUSH S7
+	STSLICER
+	PUSH S6
+	STSLICER
+	PUSH S5
+	STUR 256
+	NEWC
+	PUSH S5
+	STUR 256
+	PUSH S4
+	STUR 128
+	PUSH S3
+	STUR 256
+	STBREFR
+	STBREFR
+	ENDC
+	PUSHINT 1
+	SENDRAWMSG
+}
+IF
+BLKDROP 6
+; end function params
+EQINT -1
+PUSHCONT {
+	CALL $c7_to_c4$
+}
+IF
+TRUE
+SETGLOB 7
+
+.globl	params_internal
+.type	params_internal, @function
+; function params
+;; ret param: _owner
+PUSHSLICE x8000000000000000000000000000000000000000000000000000000000000000001_
+;; ret param: _participant
+PUSHSLICE x8000000000000000000000000000000000000000000000000000000000000000001_
+;; ret param: _expired_time
+PUSHINT 0
+;; ret param: _secret_hash
+PUSHINT 0
+;; ret param: _amount
+PUSHINT 0
+;; ret param: _balance
+PUSHINT 0
+; expValue
+; end expValue
+;; push identifier owner
+GETGLOB 10
+; colValue
+POP s6
+; end colValue
+; expValue
+; end expValue
+;; push identifier participant
+GETGLOB 11
+; colValue
+POP s5
+; end colValue
+; expValue
+; end expValue
+;; push identifier expired_time
+GETGLOB 12
+; colValue
+POP s4
+; end colValue
+; expValue
+; end expValue
+;; push identifier secret_hash
+GETGLOB 14
+; colValue
+POP s3
+; end colValue
+; expValue
+; end expValue
+;; push identifier amount
+GETGLOB 13
+; colValue
+POP s2
+; end colValue
+;; get member balance
+GETPARAM 7
+INDEX 0
+; expValue
+; end expValue
+; colValue
+NIP
+; end colValue
+;; returning named params
+; end function params
+
+.globl	c7_to_c4
+.type	c7_to_c4, @function
+GETGLOB 2
+NEWC
+STU 256
+GETGLOB 3
+STUR 64
+GETGLOB 6
+STUR 1
+NEWC
+GETGLOB 12
+GETGLOB 13
+GETGLOB 14
+REVERSE 4, 0
+STU 256
+STU 128
+STU 256
+GETGLOB 10
+GETGLOB 11
+REVERSE 4, 0
+STBREF
+STSLICE
+STSLICE
+ENDC
+POP C4
+
+.globl	c4_to_c7
+.type	c4_to_c7, @function
+PUSHROOT
+CTOS        ; c4
+LDU 256      ; pubkey c4
+LDU 64      ; pubkey timestamp c4
+LDU 1       ; pubkey [timestamp] constructor_flag memory
+LDREFRTOS
+LDU 256
+LDU 128
+PLDU 256
+SETGLOB 14
+SETGLOB 13
+SETGLOB 12
+LDMSGADDR
+LDMSGADDR
+DROP
+SETGLOB 11
+SETGLOB 10
+TRUE
+SETGLOB 1   ; pubkey [timestamp] constructor_flag
+SETGLOB 6   ; pubkey [timestamp]
+SETGLOB 3   ; D
+SETGLOB 2
+
+.macro c4_to_c7_with_init_storage
+PUSHROOT
+CTOS        ; c4
+DUP        ; c4 c4
+SBITS      ; c4 bits
+GTINT 1    ; c4 bits>1
+PUSHCONT {
+	LDU 256      ; pubkey c4
+	LDU 64      ; pubkey timestamp c4
+	LDU 1       ; pubkey [timestamp] constructor_flag memory
+	LDREFRTOS
+	LDU 256
+	LDU 128
+	PLDU 256
+	SETGLOB 14
+	SETGLOB 13
+	SETGLOB 12
+	LDMSGADDR
+	LDMSGADDR
+	DROP
+	SETGLOB 11
+	SETGLOB 10
+	TRUE
+	SETGLOB 1   ; pubkey [timestamp] constructor_flag
+	SETGLOB 6   ; pubkey [timestamp]
+	SETGLOB 3   ; D
+	SETGLOB 2
+}
+PUSHCONT {
+	PLDDICT   ; D
+	; init owner
+	PUSHSLICE x8000000000000000000000000000000000000000000000000000000000000000001_
+	SETGLOB 10
+	; init participant
+	PUSHSLICE x8000000000000000000000000000000000000000000000000000000000000000001_
+	SETGLOB 11
+	; init expired_time
+	PUSHINT 0
+	SETGLOB 12
+	; init amount
+	PUSHINT 0
+	SETGLOB 13
+	; init secret_hash
+	PUSHINT 0
+	SETGLOB 14
+	; set contract pubkey
+	PUSHINT 0
+	SWAP
+	PUSHINT 64
+	DICTUGET
+	THROWIFNOT 61
+	PLDU 256
+	SETGLOB 2
+	PUSHINT 0 ; timestamp
+	SETGLOB 3
+	PUSHINT 0 ; constructor_flag
+	SETGLOB 6
+	TRUE
+	SETGLOB 1
+}
+IFELSE
+
+.internal-alias :main_internal,        0
+.internal	:main_internal
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Function: main_internal
+;; param: contract_balance
+;; param: msg_balance
+;; param: int_msg_info
+;; param: msg_body_slice
+PUSHINT 0  ; main_external trans id
+PUSH S2
+CTOS
+LDSLICE 3
+NIP
+LDI 1     ; bounced tail
+LDMSGADDR   ; bounced src tail
+DROP
+SETGLOB 9
+IFRET
+PUSH S1    ; body
+SEMPTY     ; isEmpty
+PUSHCONT {
+}
+IFJMP
+PUSH S1            ; body
+LDUQ 32            ; [funcId] body' ok
+PUSHCONT {
+	THROW 60
+}
+IFNOTJMP
+PUSH2 S1,S1        ; funcId body' funcId funcId
+PUSHCONT {
+}
+IFNOTJMP
+LESSINT 3            ; funcId body' funcId<3
+PUSH S2              ; funcId body' funcId<3 funcId
+PUSHINT 4294967293   ; funcId body' funcId<3 funcId 4294967293
+GREATER              ; funcId body' funcId<3 funcId>4294967293
+OR                   ; funcId body' funcId<3||funcId>4294967293
+PUSHCONT {
+	THROW 60
+}
+IFJMP
+SWAP  ; body' funcId
+CALL 1
+GETGLOB 7
+ISNULL
+PUSHCONT {
+	THROW 60
+}
+IF
+
+.internal-alias :main_external,        -1
+.internal	:main_external
+PUSHINT -1 ; main_external trans id
+PUSHSLICE x8000000000000000000000000000000000000000000000000000000000000000001_
+SETGLOB 9
+PUSH S1
+CALL $c4_to_c7_with_init_storage$
+LDU 1 ; haveSign msgSlice
+SWAP
+PUSHCONT {
+	PUSHINT 512
+	LDSLICEX ; signatureSlice msgSlice
+	DUP      ; signatureSlice msgSlice msgSlice
+	HASHSU   ; signatureSlice msgSlice hashMsgSlice
+	ROT
+	GETGLOB 2
+	CHKSIGNU      ; msgSlice isSigned
+	THROWIFNOT 40 ; msgSlice
+}
+IF
+LDU 64                         ; timestamp msgSlice
+SWAP                           ; msgSlice timestamp
+CALL $replay_protection_macro$ ; msgSlice
+LDU 32  ; expireAt msgSlice
+SWAP    ; msgSlice expireAt
+NOW     ; msgSlice expireAt now
+GREATER ; msgSlice expireAt>now
+THROWIFNOT 57
+LDU  32 ; funcId body
+PUSH S1 ; funcId body funcId
+LESSINT 3            ; funcId body' funcId<3
+PUSH S2              ; funcId body' funcId<3 funcId
+PUSHINT 4294967293   ; funcId body' funcId<3 funcId 4294967293
+GREATER              ; funcId body' funcId<3 funcId>4294967293
+OR                   ; funcId body' funcId<3||funcId>4294967293
+PUSHCONT {
+	THROW 60
+}
+IFJMP
+SWAP    ; body funcId
+CALL 1
+GETGLOB 7
+ISNULL
+PUSHCONT {
+	THROW 60
+}
+IF
+

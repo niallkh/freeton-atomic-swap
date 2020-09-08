@@ -1,0 +1,540 @@
+.globl	constructor
+.public	constructor
+.type	constructor, @function
+GETGLOB 1
+ISNULL
+PUSHCONT {
+	CALL $c4_to_c7_with_init_storage$
+}
+IF
+;; constructor protection
+GETGLOB 6
+THROWIF 51
+PUSHINT 1
+SETGLOB 6
+;; end constructor protection
+; Decode input parameters
+ENDS
+; constructor AtomicSwapWallet
+GETGLOB 2
+NEQINT 0
+THROWIFNOT 100
+ACCEPT
+; end constructor AtomicSwapWallet
+CALL $c7_to_c4$
+TRUE
+SETGLOB 7
+
+.globl	createSwap
+.public	createSwap
+.type	createSwap, @function
+GETGLOB 1
+ISNULL
+PUSHCONT {
+	CALL $c4_to_c7$
+}
+IF
+; Decode input parameters
+; Decode participant
+LDMSGADDR
+; Decode amount
+LDUQ 128
+PUSHCONT {
+	;; load next cell
+	LDREF
+	ENDS
+	CTOS
+	LDU 128
+}
+IFNOT
+; Decode time
+LDUQ 256
+PUSHCONT {
+	;; load next cell
+	LDREF
+	ENDS
+	CTOS
+	LDU 256
+}
+IFNOT
+; Decode data
+;; decode TvmCell
+LDREF
+ENDS
+;; param: participant
+;; param: amount
+;; param: time
+;; param: data
+; modifier onlyOwnerAndAccept
+GETGLOB 5
+DUP
+ISNULL
+PUSHCONT {
+	DROP
+	PUSHINT 0
+}
+IF
+GETGLOB 2
+;; ==
+EQUAL
+THROWIFNOT 100
+ACCEPT
+; function createSwap
+;; get member balance
+GETPARAM 7
+INDEX 0
+;; push identifier amount
+PUSH S3
+;; >=
+GEQ
+THROWIFNOT 400
+;; push identifier codeAtomicSwap
+GETGLOB 10
+;; push identifier data
+PUSH S1
+CALL $build_state_init_macro$
+;; decl: atomicSwapStateInit
+;; push identifier atomicSwapStateInit
+DUP
+DUP
+HASHCU
+CALL $make_std_address_with_zero_wid_macro$
+;; push identifier amount
+PUSH S5
+PUSH S1
+NEWC
+STSLICECONST x62_
+STSLICE
+SWAP
+STGRAMS
+PUSHINT 105
+STZEROES
+STSLICECONST xc_
+STSLICECONST 1
+PUSH S2
+STREFR
+STSLICECONST 1
+NEWC
+STSLICECONST x2cbb75ee
+;; _participant
+;; push identifier participant
+PUSH S8
+STSLICER
+;; _amount
+;; push identifier amount
+PUSH S7
+STUR 128
+;; _time
+;; push identifier time
+PUSH S6
+STUR 256
+STBREFR
+ENDC
+PUSHINT 1
+SENDRAWMSG
+NIP
+;; decl: atomicSwap
+; expValue
+;; fetch atomicSwaps
+GETGLOB 11
+; end expValue
+;; push identifier atomicSwap
+PUSH S1
+;; array.push(..)
+SWAP
+UNPAIR
+PUSH S1
+INC
+XCHG s3
+ROTREV
+PUSHINT 32
+DICTUSET
+PAIR
+; colValue
+SETGLOB 11
+; end colValue
+;; return
+NIP
+;; emitting 1 value(s)
+PUSH S5
+EQINT -1
+PUSHCONT {
+	PUSH S7
+	CTOS
+	LDU 2
+	LDMSGADDR
+	DROP
+	NIP
+	NEWC
+	STSLICECONST xc
+	STSLICE
+	PUSHINT 96
+	STZEROES
+	STSLICECONST 0
+	STSLICECONST 0
+	STSLICECONST xb122f6b7
+	PUSH S1
+	STSLICER
+	ENDC
+	PUSHINT 1
+	SENDRAWMSG
+}
+IF
+DROP
+; end function createSwap
+BLKDROP 4
+; end modifier onlyOwnerAndAccept
+CALL $c7_to_c4$
+TRUE
+SETGLOB 7
+
+.globl	createSwap_internal
+.type	createSwap_internal, @function
+;; param: participant
+;; param: amount
+;; param: time
+;; param: data
+; modifier onlyOwnerAndAccept
+GETGLOB 5
+DUP
+ISNULL
+PUSHCONT {
+	DROP
+	PUSHINT 0
+}
+IF
+GETGLOB 2
+;; ==
+EQUAL
+THROWIFNOT 100
+ACCEPT
+; function createSwap
+;; get member balance
+GETPARAM 7
+INDEX 0
+;; push identifier amount
+PUSH S3
+;; >=
+GEQ
+THROWIFNOT 400
+;; push identifier codeAtomicSwap
+GETGLOB 10
+;; push identifier data
+PUSH S1
+CALL $build_state_init_macro$
+;; decl: atomicSwapStateInit
+;; push identifier atomicSwapStateInit
+DUP
+DUP
+HASHCU
+CALL $make_std_address_with_zero_wid_macro$
+;; push identifier amount
+PUSH S5
+PUSH S1
+NEWC
+STSLICECONST x62_
+STSLICE
+SWAP
+STGRAMS
+PUSHINT 105
+STZEROES
+STSLICECONST xc_
+STSLICECONST 1
+PUSH S2
+STREFR
+STSLICECONST 1
+NEWC
+STSLICECONST x2cbb75ee
+;; _participant
+;; push identifier participant
+PUSH S8
+STSLICER
+;; _amount
+;; push identifier amount
+PUSH S7
+STUR 128
+;; _time
+;; push identifier time
+PUSH S6
+STUR 256
+STBREFR
+ENDC
+PUSHINT 1
+SENDRAWMSG
+NIP
+;; decl: atomicSwap
+; expValue
+;; fetch atomicSwaps
+GETGLOB 11
+; end expValue
+;; push identifier atomicSwap
+PUSH S1
+;; array.push(..)
+SWAP
+UNPAIR
+PUSH S1
+INC
+XCHG s3
+ROTREV
+PUSHINT 32
+DICTUSET
+PAIR
+; colValue
+SETGLOB 11
+; end colValue
+;; return
+NIP
+TUPLE 1
+SETGLOB 8
+; end function createSwap
+BLKDROP 4
+; end modifier onlyOwnerAndAccept
+GETGLOB 8
+UNTUPLE 1
+
+.globl	getAtomicSwaps
+.public	getAtomicSwaps
+.type	getAtomicSwaps, @function
+GETGLOB 1
+ISNULL
+PUSHCONT {
+	CALL $c4_to_c7$
+}
+IF
+; Decode input parameters
+ENDS
+; function getAtomicSwaps
+;; return
+;; push identifier atomicSwaps
+GETGLOB 11
+;; emitting 1 value(s)
+PUSH S1
+EQINT -1
+PUSHCONT {
+	PUSH S3
+	CTOS
+	LDU 2
+	LDMSGADDR
+	DROP
+	NIP
+	NEWC
+	STSLICECONST xc
+	STSLICE
+	PUSHINT 96
+	STZEROES
+	STSLICECONST 0
+	STSLICECONST 0
+	STSLICECONST xc9fdd0b9
+	PUSH S1
+	UNPAIR
+	XCHG s2
+	STU 32
+	STDICT
+	ENDC
+	PUSHINT 1
+	SENDRAWMSG
+}
+IF
+DROP
+; end function getAtomicSwaps
+EQINT -1
+PUSHCONT {
+	CALL $c7_to_c4$
+}
+IF
+TRUE
+SETGLOB 7
+
+.globl	getAtomicSwaps_internal
+.type	getAtomicSwaps_internal, @function
+; function getAtomicSwaps
+;; return
+;; push identifier atomicSwaps
+GETGLOB 11
+; end function getAtomicSwaps
+
+.globl	c7_to_c4
+.type	c7_to_c4, @function
+GETGLOB 2
+NEWC
+STU 256
+GETGLOB 3
+STUR 64
+GETGLOB 6
+STUR 1
+GETGLOB 10
+GETGLOB 11
+UNTUPLE 2
+REVERSE 4, 0
+STREF
+STU 32
+STDICT
+ENDC
+POP C4
+
+.globl	c4_to_c7
+.type	c4_to_c7, @function
+PUSHROOT
+CTOS        ; c4
+LDU 256      ; pubkey c4
+LDU 64      ; pubkey timestamp c4
+LDU 1       ; pubkey [timestamp] constructor_flag memory
+LDREF
+LDU 32
+PLDDICT
+PAIR
+SETGLOB 11
+SETGLOB 10
+TRUE
+SETGLOB 1   ; pubkey [timestamp] constructor_flag
+SETGLOB 6   ; pubkey [timestamp]
+SETGLOB 3   ; D
+SETGLOB 2
+
+.macro c4_to_c7_with_init_storage
+PUSHROOT
+CTOS        ; c4
+DUP        ; c4 c4
+SBITS      ; c4 bits
+GTINT 1    ; c4 bits>1
+PUSHCONT {
+	LDU 256      ; pubkey c4
+	LDU 64      ; pubkey timestamp c4
+	LDU 1       ; pubkey [timestamp] constructor_flag memory
+	LDREF
+	LDU 32
+	PLDDICT
+	PAIR
+	SETGLOB 11
+	SETGLOB 10
+	TRUE
+	SETGLOB 1   ; pubkey [timestamp] constructor_flag
+	SETGLOB 6   ; pubkey [timestamp]
+	SETGLOB 3   ; D
+	SETGLOB 2
+}
+PUSHCONT {
+	PLDDICT   ; D
+	; init codeAtomicSwap
+	NEWC
+	ENDC
+	SETGLOB 10
+	; init atomicSwaps
+	PUSHINT 0
+	NEWDICT
+	PAIR
+	SETGLOB 11
+	; set contract pubkey
+	PUSHINT 0
+	SWAP
+	PUSHINT 64
+	DICTUGET
+	THROWIFNOT 61
+	PLDU 256
+	SETGLOB 2
+	PUSHINT 0 ; timestamp
+	SETGLOB 3
+	PUSHINT 0 ; constructor_flag
+	SETGLOB 6
+	TRUE
+	SETGLOB 1
+}
+IFELSE
+
+.internal-alias :main_internal,        0
+.internal	:main_internal
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Function: main_internal
+;; param: contract_balance
+;; param: msg_balance
+;; param: int_msg_info
+;; param: msg_body_slice
+PUSHINT 0  ; main_external trans id
+PUSH S2
+CTOS
+LDSLICE 3
+NIP
+LDI 1     ; bounced tail
+DROP
+IFRET
+PUSH S1    ; body
+SEMPTY     ; isEmpty
+PUSHCONT {
+}
+IFJMP
+PUSH S1            ; body
+LDUQ 32            ; [funcId] body' ok
+PUSHCONT {
+	THROW 60
+}
+IFNOTJMP
+PUSH2 S1,S1        ; funcId body' funcId funcId
+PUSHCONT {
+}
+IFNOTJMP
+LESSINT 3            ; funcId body' funcId<3
+PUSH S2              ; funcId body' funcId<3 funcId
+PUSHINT 4294967293   ; funcId body' funcId<3 funcId 4294967293
+GREATER              ; funcId body' funcId<3 funcId>4294967293
+OR                   ; funcId body' funcId<3||funcId>4294967293
+PUSHCONT {
+	THROW 60
+}
+IFJMP
+SWAP  ; body' funcId
+CALL 1
+GETGLOB 7
+ISNULL
+PUSHCONT {
+	THROW 60
+}
+IF
+
+.internal-alias :main_external,        -1
+.internal	:main_external
+PUSHINT -1 ; main_external trans id
+PUSH S1
+CALL $c4_to_c7_with_init_storage$
+LDU 1 ; haveSign msgSlice
+SWAP
+PUSHCONT {
+	PUSHINT 512
+	LDSLICEX ; signatureSlice msgSlice
+	DUP      ; signatureSlice msgSlice msgSlice
+	HASHSU   ; signatureSlice msgSlice hashMsgSlice
+	ROT
+	GETGLOB 2
+	DUP
+	SETGLOB 5
+	CHKSIGNU      ; msgSlice isSigned
+	THROWIFNOT 40 ; msgSlice
+}
+IF
+LDU 64                         ; timestamp msgSlice
+SWAP                           ; msgSlice timestamp
+CALL $replay_protection_macro$ ; msgSlice
+LDU 32  ; expireAt msgSlice
+SWAP    ; msgSlice expireAt
+NOW     ; msgSlice expireAt now
+GREATER ; msgSlice expireAt>now
+THROWIFNOT 57
+LDU  32 ; funcId body
+PUSH S1 ; funcId body funcId
+LESSINT 3            ; funcId body' funcId<3
+PUSH S2              ; funcId body' funcId<3 funcId
+PUSHINT 4294967293   ; funcId body' funcId<3 funcId 4294967293
+GREATER              ; funcId body' funcId<3 funcId>4294967293
+OR                   ; funcId body' funcId<3||funcId>4294967293
+PUSHCONT {
+	THROW 60
+}
+IFJMP
+SWAP    ; body funcId
+CALL 1
+GETGLOB 7
+ISNULL
+PUSHCONT {
+	THROW 60
+}
+IF
+

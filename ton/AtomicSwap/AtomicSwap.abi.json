@@ -1,0 +1,67 @@
+{
+	"ABI version": 2,
+	"header": ["time", "expire"],
+	"functions": [
+		{
+			"name": "constructor",
+			"inputs": [
+				{"name":"_participant","type":"address"},
+				{"name":"_amount","type":"uint128"},
+				{"name":"_time","type":"uint256"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "redeem",
+			"inputs": [
+				{"name":"secret","type":"uint256"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "refund",
+			"inputs": [
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "params",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"_owner","type":"address"},
+				{"name":"_participant","type":"address"},
+				{"name":"_expired_time","type":"uint256"},
+				{"name":"_secret_hash","type":"uint256"},
+				{"name":"_amount","type":"uint128"},
+				{"name":"_balance","type":"uint256"}
+			]
+		}
+	],
+	"data": [
+	],
+	"events": [
+		{
+			"name": "Redeemed",
+			"inputs": [
+				{"name":"secret","type":"uint256"},
+				{"name":"addr","type":"address"},
+				{"name":"time","type":"uint256"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "Refunded",
+			"inputs": [
+				{"name":"addr","type":"address"},
+				{"name":"time","type":"uint256"}
+			],
+			"outputs": [
+			]
+		}
+	]
+}

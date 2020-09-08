@@ -1,4 +1,3 @@
-rm -rf ton/build &&
-solc ton/$1.sol -o ton/build &&
-tvm_linker compile ton/build/$1.code &&
-mv *.tvc ton/build
+solc ton/$1/$1.sol -o ton/$1 &&
+tvm_linker compile ton/$1/$1.code &&
+mv *.tvc ton/$1/$1.tvc 
