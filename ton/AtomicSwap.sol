@@ -11,8 +11,9 @@ contract AtomicSwap {
     address owner;
     address participant;
     uint256 expired_time;
-    uint256 secret_hash;
     uint128 amount;
+
+    uint256 secret_hash;
 
     event Redeemed(uint256 secret, address addr, uint256 time);
     event Refunded(address addr, uint256 time);
@@ -41,12 +42,11 @@ contract AtomicSwap {
      * @dev        Construct contract for atomic swap. Owner of this contract
      *             from tmv.pubkey()
      * @param      _participant  The participant
-     * @param      _amount        The amount
+     * @param      _amount       The amount
      * @param      _time         The time, must be less than 1 year (31_536_000
      *                           sec)
-     * @param      _secret_hash  The secret hash
      */
-    constructor(address _participant, uint128 _amount, uint256 _time, uint256 _secret_hash) public {
+    constructor(address _participant, uint128 _amount, uint256 _time) public {
         require(!msg.sender.isNone(), 400);
         require(!_participant.isNone(), 400);
         require(_time > 0 || _time <= 31_536_0001, 400);
@@ -56,7 +56,6 @@ contract AtomicSwap {
         participant = _participant;
         amount = _amount;
         expired_time = now + _time;
-        secret_hash = _secret_hash;
     }
 
 

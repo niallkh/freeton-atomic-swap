@@ -4,9 +4,15 @@ pragma AbiHeader expire;
 
 import "AtomicSwap.sol";
 
+
+/**
+ * @title      { title }
+ */
 contract AtomicSwapWallet {
 
-    TvmCell atomicSwapContract;
+    TvmCell codeAtomicSwap;
+
+    address[] atomicSwaps;
 
     modifier onlyOwnerAndAccept() {
         require(msg.pubkey() == tvm.pubkey());
@@ -19,21 +25,42 @@ contract AtomicSwapWallet {
         tvm.accept();
     }
 
+    /**
+     * @dev        {developper_note }
+     * @param      participant  The participant
+     * @param      amount       The amount
+     * @param      time         The time
+     * @param      data         The data
+     */
     function createSwap(
         address participant, 
         uint128 amount,
         uint256 time, 
-        uint256 secret_hash
+        TvmCell data
     ) public onlyOwnerAndAccept returns (address) {
         require(address(this).balance >= amount, 400);
+
+        TvmCell atomicSwapStateInit = tvm.buildStateInit(codeAtomicSwap, data);
                 
-        address atomicSwap = new AtomicSwap {stateInit: atomicSwapContract,value: amount} (
+        address atomicSwap = new AtomicSwap {
+            stateInit: atomicSwapStateInit,
+            value: amount
+        } (
             participant, 
             amount,
-            time, 
-            secret_hash
+            time
         );
+
+        atomicSwaps.push(atomicSwap);
         
         return atomicSwap;
+    }
+
+
+    /**
+     * @dev        {developper_note }
+     */
+    function getAtomicSwaps() public view returns (address[]) {
+        return atomicSwaps;
     }
 }
