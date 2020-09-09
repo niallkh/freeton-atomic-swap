@@ -7,7 +7,7 @@
 			"inputs": [
 				{"name":"_participant","type":"address"},
 				{"name":"_amount","type":"uint128"},
-				{"name":"_time","type":"uint256"}
+				{"name":"_time","type":"uint32"}
 			],
 			"outputs": [
 			]
@@ -28,20 +28,28 @@
 			]
 		},
 		{
+			"name": "destruct",
+			"inputs": [
+			],
+			"outputs": [
+			]
+		},
+		{
 			"name": "params",
 			"inputs": [
 			],
 			"outputs": [
 				{"name":"_owner","type":"address"},
 				{"name":"_participant","type":"address"},
-				{"name":"_expired_time","type":"uint256"},
-				{"name":"_secret_hash","type":"uint256"},
+				{"name":"_expiredTime","type":"uint32"},
+				{"name":"_secretHash","type":"uint256"},
 				{"name":"_amount","type":"uint128"},
 				{"name":"_balance","type":"uint256"}
 			]
 		}
 	],
 	"data": [
+		{"key":1,"name":"secretHash","type":"uint256"}
 	],
 	"events": [
 		{

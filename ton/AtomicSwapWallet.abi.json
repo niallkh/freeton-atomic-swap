@@ -1,0 +1,123 @@
+{
+	"ABI version": 2,
+	"header": ["time", "expire"],
+	"functions": [
+		{
+			"name": "constructor",
+			"inputs": [
+				{"name":"_codeAtomicSwap","type":"cell"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "createSwap",
+			"inputs": [
+				{"name":"participant","type":"address"},
+				{"name":"amount","type":"uint128"},
+				{"name":"time","type":"uint32"},
+				{"name":"data","type":"cell"}
+			],
+			"outputs": [
+				{"name":"value0","type":"address"}
+			]
+		},
+		{
+			"name": "redeem",
+			"inputs": [
+				{"name":"secret","type":"uint256"},
+				{"name":"secretHash","type":"uint256"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "refund",
+			"inputs": [
+				{"name":"secretHash","type":"uint256"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "onRedeem",
+			"inputs": [
+				{"name":"secretHash","type":"uint256"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "onRefund",
+			"inputs": [
+				{"name":"secretHash","type":"uint256"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "onInitiate",
+			"inputs": [
+				{"name":"secretHash","type":"uint256"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "onParticipate",
+			"inputs": [
+				{"name":"secretHash","type":"uint256"}
+			],
+			"outputs": [
+			]
+		}
+	],
+	"data": [
+	],
+	"events": [
+		{
+			"name": "OnParticipate",
+			"inputs": [
+				{"name":"secretHash","type":"uint256"},
+				{"name":"atomicSwap","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "OnInitiate",
+			"inputs": [
+				{"name":"secretHash","type":"uint256"},
+				{"name":"atomicSwap","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "OnRedeemed",
+			"inputs": [
+				{"name":"secretHash","type":"uint256"},
+				{"name":"amount","type":"uint256"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "OnRefunded",
+			"inputs": [
+				{"name":"secretHash","type":"uint256"},
+				{"name":"amount","type":"uint256"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "Error",
+			"inputs": [
+				{"name":"code","type":"uint32"}
+			],
+			"outputs": [
+			]
+		}
+	]
+}
