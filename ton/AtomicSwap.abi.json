@@ -44,7 +44,9 @@
 				{"name":"_expiredTime","type":"uint32"},
 				{"name":"_secretHash","type":"uint256"},
 				{"name":"_amount","type":"uint128"},
-				{"name":"_balance","type":"uint256"}
+				{"name":"_balance","type":"uint256"},
+				{"name":"_redeemed","type":"bool"},
+				{"name":"_refunded","type":"bool"}
 			]
 		}
 	],

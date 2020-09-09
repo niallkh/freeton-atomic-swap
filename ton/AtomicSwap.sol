@@ -79,7 +79,7 @@ contract AtomicSwap is IAtomicSwap {
         emit Refunded(owner, now);
     }
 
-    function destruct() external override onlyOwner onlyOwner whenExpired whenRedeemedOrRefunded {
+    function destruct() external override onlyOwner whenExpired whenRedeemedOrRefunded {
         selfdestruct(owner);
     }
 
@@ -89,7 +89,9 @@ contract AtomicSwap is IAtomicSwap {
         uint32 _expiredTime,
         uint256 _secretHash,
         uint128 _amount,
-        uint256 _balance
+        uint256 _balance,
+        bool _redeemed,
+        bool _refunded
     ) {
         _owner = owner;
         _participant = participant;
@@ -97,6 +99,8 @@ contract AtomicSwap is IAtomicSwap {
         _secretHash = secretHash;
         _amount = amount;
         _balance = address(this).balance;
+        _redeemed = redeemed;
+        _refunded = refunded;
     }
 
     onBounce(TvmSlice slice) external {

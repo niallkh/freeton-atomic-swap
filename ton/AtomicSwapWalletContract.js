@@ -27,6 +27,22 @@ const abi = {
 			]
 		},
 		{
+			"name": "onInitiate",
+			"inputs": [
+				{"name":"secretHash","type":"uint256"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "onParticipate",
+			"inputs": [
+				{"name":"secretHash","type":"uint256"}
+			],
+			"outputs": [
+			]
+		},
+		{
 			"name": "redeem",
 			"inputs": [
 				{"name":"secret","type":"uint256"},
@@ -37,6 +53,14 @@ const abi = {
 		},
 		{
 			"name": "refund",
+			"inputs": [
+				{"name":"secretHash","type":"uint256"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "destruct",
 			"inputs": [
 				{"name":"secretHash","type":"uint256"}
 			],
@@ -60,19 +84,12 @@ const abi = {
 			]
 		},
 		{
-			"name": "onInitiate",
+			"name": "hashSecret",
 			"inputs": [
-				{"name":"secretHash","type":"uint256"}
+				{"name":"secret","type":"bytes"}
 			],
 			"outputs": [
-			]
-		},
-		{
-			"name": "onParticipate",
-			"inputs": [
-				{"name":"secretHash","type":"uint256"}
-			],
-			"outputs": [
+				{"name":"value0","type":"uint256"}
 			]
 		}
 	],
@@ -128,7 +145,7 @@ const abi = {
 
 const pkg = {
     abi,
-    imageBase64: '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',
+    imageBase64: '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',
 };
 
 class AtomicSwapWalletContract {
@@ -225,6 +242,38 @@ class AtomicSwapWalletContract {
 
     /**
      * @param {object} params
+     * @param {string} params.secretHash (uint256)
+     */
+    onInitiate(params) {
+        return this.run('onInitiate', params);
+    }
+
+    /**
+     * @param {object} params
+     * @param {string} params.secretHash (uint256)
+     */
+    onInitiateLocal(params) {
+        return this.runLocal('onInitiate', params);
+    }
+
+    /**
+     * @param {object} params
+     * @param {string} params.secretHash (uint256)
+     */
+    onParticipate(params) {
+        return this.run('onParticipate', params);
+    }
+
+    /**
+     * @param {object} params
+     * @param {string} params.secretHash (uint256)
+     */
+    onParticipateLocal(params) {
+        return this.runLocal('onParticipate', params);
+    }
+
+    /**
+     * @param {object} params
      * @param {string} params.secret (uint256)
      * @param {string} params.secretHash (uint256)
      */
@@ -261,6 +310,22 @@ class AtomicSwapWalletContract {
      * @param {object} params
      * @param {string} params.secretHash (uint256)
      */
+    destruct(params) {
+        return this.run('destruct', params);
+    }
+
+    /**
+     * @param {object} params
+     * @param {string} params.secretHash (uint256)
+     */
+    destructLocal(params) {
+        return this.runLocal('destruct', params);
+    }
+
+    /**
+     * @param {object} params
+     * @param {string} params.secretHash (uint256)
+     */
     onRedeem(params) {
         return this.run('onRedeem', params);
     }
@@ -290,35 +355,27 @@ class AtomicSwapWalletContract {
     }
 
     /**
-     * @param {object} params
-     * @param {string} params.secretHash (uint256)
+     * @typedef AtomicSwapWalletContract_hashSecret
+     * @type {object}
+     * @property {string} value0  (uint256)
      */
-    onInitiate(params) {
-        return this.run('onInitiate', params);
+
+    /**
+     * @param {object} params
+     * @param {bytes} params.secret
+     * @return {Promise.<AtomicSwapWalletContract_hashSecret>}
+     */
+    hashSecret(params) {
+        return this.run('hashSecret', params);
     }
 
     /**
      * @param {object} params
-     * @param {string} params.secretHash (uint256)
+     * @param {bytes} params.secret
+     * @return {Promise.<AtomicSwapWalletContract_hashSecret>}
      */
-    onInitiateLocal(params) {
-        return this.runLocal('onInitiate', params);
-    }
-
-    /**
-     * @param {object} params
-     * @param {string} params.secretHash (uint256)
-     */
-    onParticipate(params) {
-        return this.run('onParticipate', params);
-    }
-
-    /**
-     * @param {object} params
-     * @param {string} params.secretHash (uint256)
-     */
-    onParticipateLocal(params) {
-        return this.runLocal('onParticipate', params);
+    hashSecretLocal(params) {
+        return this.runLocal('hashSecret', params);
     }
 
 }

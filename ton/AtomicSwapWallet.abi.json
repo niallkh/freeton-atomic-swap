@@ -23,6 +23,22 @@
 			]
 		},
 		{
+			"name": "onInitiate",
+			"inputs": [
+				{"name":"secretHash","type":"uint256"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "onParticipate",
+			"inputs": [
+				{"name":"secretHash","type":"uint256"}
+			],
+			"outputs": [
+			]
+		},
+		{
 			"name": "redeem",
 			"inputs": [
 				{"name":"secret","type":"uint256"},
@@ -33,6 +49,14 @@
 		},
 		{
 			"name": "refund",
+			"inputs": [
+				{"name":"secretHash","type":"uint256"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "destruct",
 			"inputs": [
 				{"name":"secretHash","type":"uint256"}
 			],
@@ -56,19 +80,12 @@
 			]
 		},
 		{
-			"name": "onInitiate",
+			"name": "hashSecret",
 			"inputs": [
-				{"name":"secretHash","type":"uint256"}
+				{"name":"secret","type":"bytes"}
 			],
 			"outputs": [
-			]
-		},
-		{
-			"name": "onParticipate",
-			"inputs": [
-				{"name":"secretHash","type":"uint256"}
-			],
-			"outputs": [
+				{"name":"value0","type":"uint256"}
 			]
 		}
 	],

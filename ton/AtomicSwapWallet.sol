@@ -41,14 +41,13 @@ contract AtomicSwapWallet is IAtomicSwapWallet {
         require(!participant.isNone(), 400);
         require(address(this) != participant, 401);
         require(time > 0, 402);
-        require(msg.value >= amount + 1, 403); // additional ton for fees
-        require(address(this).balance >= amount, 404);
+        require(address(this).balance >= amount + 1_000_000_000, 404); // additional ton for fees
 
         TvmCell atomicSwapStateInit = tvm.buildStateInit(codeAtomicSwap, data);
                 
         address atomicSwap = new AtomicSwap {
             stateInit: atomicSwapStateInit,
-            value: amount,
+            value: amount + 1_000_000_000,
             flag: 1
         } (
             participant, 
@@ -59,9 +58,25 @@ contract AtomicSwapWallet is IAtomicSwapWallet {
         return atomicSwap;
     }
 
+    function onInitiate(uint256 secretHash) public override {
+        msg.sender.transfer(0, false, 64);
+        initiatorAtomicSwaps[secretHash] = msg.sender;
+        emit OnInitiate(secretHash, msg.sender);
+    }
+
+    function onParticipate(uint256 secretHash) public override {
+        msg.sender.transfer(0, false, 64);
+        participantAtomicSwaps[secretHash] = msg.sender;
+        emit OnParticipate(secretHash, msg.sender);
+    }
+
     function redeem(uint256 secret, uint256 secretHash) external onlyOwnerAndAccept {
         optional(address) atomicSwap = participantAtomicSwaps.fetch(secretHash);
         require(atomicSwap.hasValue(), 406);
+
+        uint256 computed_hash = uint256(sha256(abi.encodePacked(secret)));
+        require(computed_hash == secretHash, 413);
+
         IAtomicSwap(atomicSwap.get()).redeem { value: 100_000_000, bounce: true, flag: 1 } (secret);
     }
 
@@ -71,10 +86,18 @@ contract AtomicSwapWallet is IAtomicSwapWallet {
         IAtomicSwap(atomicSwap.get()).refund { value: 100_000_000, bounce: true, flag: 1 } ();
     }
 
+    function destruct(uint256 secretHash) public onlyOwnerAndAccept {
+        optional(address) atomicSwap = initiatorAtomicSwaps.fetch(secretHash);
+        require(atomicSwap.hasValue(), 407);
+        delete initiatorAtomicSwaps[secretHash];
+        IAtomicSwap(atomicSwap.get()).destruct { value: 100_000_000, bounce: true, flag: 1 } ();        
+    }
+
     function onRedeem(uint256 secretHash) public override {
         optional(address) atomicSwap = participantAtomicSwaps.fetch(secretHash);
         require(atomicSwap.hasValue(), 408);
         require(atomicSwap.get() == msg.sender, 409);
+        delete participantAtomicSwaps[secretHash];
         emit OnRedeemed(secretHash, msg.value);
     }
 
@@ -82,17 +105,12 @@ contract AtomicSwapWallet is IAtomicSwapWallet {
         optional(address) atomicSwap = initiatorAtomicSwaps.fetch(secretHash);
         require(atomicSwap.hasValue(), 410);
         require(atomicSwap.get() == msg.sender, 411);
+        delete initiatorAtomicSwaps[secretHash];
         emit OnRefunded(secretHash, msg.value);
     }
 
-    function onInitiate(uint256 secretHash) public override {
-        msg.sender.transfer(0, false, 64);
-        emit OnInitiate(secretHash, msg.sender);
-    }
-
-    function onParticipate(uint256 secretHash) public override {
-        msg.sender.transfer(0, false, 64);
-        emit OnParticipate(secretHash, msg.sender);
+    function hashSecret(bytes secret) public pure returns (uint256) {
+        return uint256(sha256(secret));
     }
 
     onBounce(TvmSlice slice) external {

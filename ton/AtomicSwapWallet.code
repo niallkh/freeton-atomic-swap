@@ -110,22 +110,15 @@ THROWIFNOT 401
 PUSH S1
 GTINT 0
 THROWIFNOT 402
-;; get member value
-CALL $message_balance_macro$
-;; push identifier amount
-PUSH S3
-PUSHINT 1
-;; +
-ADD
-UFITS 128
-;; >=
-GEQ
-THROWIFNOT 403
 ;; get member balance
 GETPARAM 7
 INDEX 0
 ;; push identifier amount
 PUSH S3
+PUSHINT 1000000000
+;; +
+ADD
+UFITS 128
 ;; >=
 GEQ
 THROWIFNOT 404
@@ -142,6 +135,10 @@ HASHCU
 CALL $make_std_address_with_zero_wid_macro$
 ;; push identifier amount
 PUSH S5
+PUSHINT 1000000000
+;; +
+ADD
+UFITS 128
 PUSH S1
 NEWC
 STSLICECONST x62_
@@ -249,22 +246,15 @@ THROWIFNOT 401
 PUSH S1
 GTINT 0
 THROWIFNOT 402
-;; get member value
-CALL $message_balance_macro$
-;; push identifier amount
-PUSH S3
-PUSHINT 1
-;; +
-ADD
-UFITS 128
-;; >=
-GEQ
-THROWIFNOT 403
 ;; get member balance
 GETPARAM 7
 INDEX 0
 ;; push identifier amount
 PUSH S3
+PUSHINT 1000000000
+;; +
+ADD
+UFITS 128
 ;; >=
 GEQ
 THROWIFNOT 404
@@ -281,6 +271,10 @@ HASHCU
 CALL $make_std_address_with_zero_wid_macro$
 ;; push identifier amount
 PUSH S5
+PUSHINT 1000000000
+;; +
+ADD
+UFITS 128
 PUSH S1
 NEWC
 STSLICECONST x62_
@@ -323,6 +317,246 @@ BLKDROP 4
 ; end modifier onlyOwnerAndAccept
 GETGLOB 8
 UNTUPLE 1
+
+.globl	onInitiate
+.public	onInitiate
+.type	onInitiate, @function
+GETGLOB 1
+ISNULL
+PUSHCONT {
+	CALL $c4_to_c7$
+}
+IF
+; Decode input parameters
+; Decode secretHash
+LDU 256
+ENDS
+;; param: secretHash
+; function onInitiate
+;; transfer()
+;; get member sender
+GETGLOB 9
+NEWC
+STSLICECONST x42_
+STSLICE
+PUSHINT 109
+STZEROES
+STSLICECONST 0
+STSLICECONST 0
+ENDC
+PUSHINT 64
+SENDRAWMSG
+; expValue
+;; fetch initiatorAtomicSwaps
+GETGLOB 11
+;; push identifier secretHash
+PUSH S1
+SWAP
+; end expValue
+;; get member sender
+GETGLOB 9
+; colValue
+ROTREV
+PUSHINT 256
+DICTUSET
+SETGLOB 11
+; end colValue
+;; emit OnInitiate
+NEWC
+PUSHSLICE xc0000000000000000000000002_
+STSLICER
+STSLICECONST 0
+STSLICECONST 0
+STSLICECONST x443b3bc4
+;; secretHash
+;; push identifier secretHash
+PUSH S1
+STUR 256
+;; atomicSwap
+;; get member sender
+GETGLOB 9
+STSLICER
+ENDC
+PUSHINT 1
+SENDRAWMSG
+DROP
+; end function onInitiate
+CALL $c7_to_c4$
+TRUE
+SETGLOB 7
+
+.globl	onInitiate_internal
+.type	onInitiate_internal, @function
+;; param: secretHash
+; function onInitiate
+;; transfer()
+;; get member sender
+GETGLOB 9
+NEWC
+STSLICECONST x42_
+STSLICE
+PUSHINT 109
+STZEROES
+STSLICECONST 0
+STSLICECONST 0
+ENDC
+PUSHINT 64
+SENDRAWMSG
+; expValue
+;; fetch initiatorAtomicSwaps
+GETGLOB 11
+;; push identifier secretHash
+PUSH S1
+SWAP
+; end expValue
+;; get member sender
+GETGLOB 9
+; colValue
+ROTREV
+PUSHINT 256
+DICTUSET
+SETGLOB 11
+; end colValue
+;; emit OnInitiate
+NEWC
+PUSHSLICE xc0000000000000000000000002_
+STSLICER
+STSLICECONST 0
+STSLICECONST 0
+STSLICECONST x443b3bc4
+;; secretHash
+;; push identifier secretHash
+PUSH S1
+STUR 256
+;; atomicSwap
+;; get member sender
+GETGLOB 9
+STSLICER
+ENDC
+PUSHINT 1
+SENDRAWMSG
+DROP
+; end function onInitiate
+
+.globl	onParticipate
+.public	onParticipate
+.type	onParticipate, @function
+GETGLOB 1
+ISNULL
+PUSHCONT {
+	CALL $c4_to_c7$
+}
+IF
+; Decode input parameters
+; Decode secretHash
+LDU 256
+ENDS
+;; param: secretHash
+; function onParticipate
+;; transfer()
+;; get member sender
+GETGLOB 9
+NEWC
+STSLICECONST x42_
+STSLICE
+PUSHINT 109
+STZEROES
+STSLICECONST 0
+STSLICECONST 0
+ENDC
+PUSHINT 64
+SENDRAWMSG
+; expValue
+;; fetch participantAtomicSwaps
+GETGLOB 12
+;; push identifier secretHash
+PUSH S1
+SWAP
+; end expValue
+;; get member sender
+GETGLOB 9
+; colValue
+ROTREV
+PUSHINT 256
+DICTUSET
+SETGLOB 12
+; end colValue
+;; emit OnParticipate
+NEWC
+PUSHSLICE xc0000000000000000000000002_
+STSLICER
+STSLICECONST 0
+STSLICECONST 0
+STSLICECONST x1911ce72
+;; secretHash
+;; push identifier secretHash
+PUSH S1
+STUR 256
+;; atomicSwap
+;; get member sender
+GETGLOB 9
+STSLICER
+ENDC
+PUSHINT 1
+SENDRAWMSG
+DROP
+; end function onParticipate
+CALL $c7_to_c4$
+TRUE
+SETGLOB 7
+
+.globl	onParticipate_internal
+.type	onParticipate_internal, @function
+;; param: secretHash
+; function onParticipate
+;; transfer()
+;; get member sender
+GETGLOB 9
+NEWC
+STSLICECONST x42_
+STSLICE
+PUSHINT 109
+STZEROES
+STSLICECONST 0
+STSLICECONST 0
+ENDC
+PUSHINT 64
+SENDRAWMSG
+; expValue
+;; fetch participantAtomicSwaps
+GETGLOB 12
+;; push identifier secretHash
+PUSH S1
+SWAP
+; end expValue
+;; get member sender
+GETGLOB 9
+; colValue
+ROTREV
+PUSHINT 256
+DICTUSET
+SETGLOB 12
+; end colValue
+;; emit OnParticipate
+NEWC
+PUSHSLICE xc0000000000000000000000002_
+STSLICER
+STSLICECONST 0
+STSLICECONST 0
+STSLICECONST x1911ce72
+;; secretHash
+;; push identifier secretHash
+PUSH S1
+STUR 256
+;; atomicSwap
+;; get member sender
+GETGLOB 9
+STSLICER
+ENDC
+PUSHINT 1
+SENDRAWMSG
+DROP
+; end function onParticipate
 
 .globl	redeem
 .public	redeem
@@ -379,8 +613,25 @@ DUP
 ISNULL
 NOT
 THROWIFNOT 406
-;; push identifier atomicSwap
+NEWC
+;; push identifier secret
+PUSH S3
+STUR 256
+ENDC
+CTOS
+SHA256U
+;; uint256
+UFITS 256
+;; decl: computed_hash
+;; push identifier computed_hash
 DUP
+;; push identifier secretHash
+PUSH S3
+;; ==
+EQUAL
+THROWIFNOT 413
+;; push identifier atomicSwap
+PUSH S1
 DUP
 ISNULL
 THROWIF 63
@@ -399,12 +650,12 @@ STSLICECONST 0
 STSLICECONST x36f8d75c
 ;; secret
 ;; push identifier secret
-PUSH S3
+PUSH S4
 STUR 256
 ENDC
 PUSHINT 1
 SENDRAWMSG
-DROP
+DROP2
 ; end function redeem
 DROP2
 ; end modifier onlyOwnerAndAccept
@@ -446,8 +697,25 @@ DUP
 ISNULL
 NOT
 THROWIFNOT 406
-;; push identifier atomicSwap
+NEWC
+;; push identifier secret
+PUSH S3
+STUR 256
+ENDC
+CTOS
+SHA256U
+;; uint256
+UFITS 256
+;; decl: computed_hash
+;; push identifier computed_hash
 DUP
+;; push identifier secretHash
+PUSH S3
+;; ==
+EQUAL
+THROWIFNOT 413
+;; push identifier atomicSwap
+PUSH S1
 DUP
 ISNULL
 THROWIF 63
@@ -466,12 +734,12 @@ STSLICECONST 0
 STSLICECONST x36f8d75c
 ;; secret
 ;; push identifier secret
-PUSH S3
+PUSH S4
 STUR 256
 ENDC
 PUSHINT 1
 SENDRAWMSG
-DROP
+DROP2
 ; end function redeem
 DROP2
 ; end modifier onlyOwnerAndAccept
@@ -608,6 +876,172 @@ DROP
 DROP
 ; end modifier onlyOwnerAndAccept
 
+.globl	destruct
+.public	destruct
+.type	destruct, @function
+GETGLOB 1
+ISNULL
+PUSHCONT {
+	CALL $c4_to_c7$
+}
+IF
+; Decode input parameters
+; Decode secretHash
+LDU 256
+ENDS
+;; param: secretHash
+; modifier onlyOwnerAndAccept
+GETGLOB 5
+DUP
+ISNULL
+PUSHCONT {
+	DROP
+	PUSHINT 0
+}
+IF
+GETGLOB 2
+;; ==
+EQUAL
+THROWIFNOT 100
+ACCEPT
+; function destruct
+;; map.fetch
+;; push identifier secretHash
+DUP
+;; push identifier initiatorAtomicSwaps
+GETGLOB 11
+PUSHINT 256
+DICTUGET
+NULLSWAPIFNOT
+DROP
+;; decl: atomicSwap
+;; push identifier atomicSwap
+DUP
+ISNULL
+NOT
+THROWIFNOT 407
+;; delete
+; expValue
+;; fetch initiatorAtomicSwaps
+GETGLOB 11
+;; push identifier secretHash
+PUSH S2
+SWAP
+; end expValue
+PUSH S1
+SWAP
+PUSHINT 256
+DICTUDEL
+DROP
+; colValue
+NIP
+SETGLOB 11
+; end colValue
+;; push identifier atomicSwap
+DUP
+DUP
+ISNULL
+THROWIF 63
+TRUE
+NEWC
+STSLICECONST x6_
+STI 1
+PUSHINT 3
+STZEROES
+STSLICE
+PUSHSLICE x405f5e100000000000000000000000000004_
+STSLICER
+STSLICECONST 0
+;; Remote call IAtomicSwap.destruct
+STSLICECONST 0
+STSLICECONST x47c62dda
+ENDC
+PUSHINT 1
+SENDRAWMSG
+DROP
+; end function destruct
+DROP
+; end modifier onlyOwnerAndAccept
+CALL $c7_to_c4$
+TRUE
+SETGLOB 7
+
+.globl	destruct_internal
+.type	destruct_internal, @function
+;; param: secretHash
+; modifier onlyOwnerAndAccept
+GETGLOB 5
+DUP
+ISNULL
+PUSHCONT {
+	DROP
+	PUSHINT 0
+}
+IF
+GETGLOB 2
+;; ==
+EQUAL
+THROWIFNOT 100
+ACCEPT
+; function destruct
+;; map.fetch
+;; push identifier secretHash
+DUP
+;; push identifier initiatorAtomicSwaps
+GETGLOB 11
+PUSHINT 256
+DICTUGET
+NULLSWAPIFNOT
+DROP
+;; decl: atomicSwap
+;; push identifier atomicSwap
+DUP
+ISNULL
+NOT
+THROWIFNOT 407
+;; delete
+; expValue
+;; fetch initiatorAtomicSwaps
+GETGLOB 11
+;; push identifier secretHash
+PUSH S2
+SWAP
+; end expValue
+PUSH S1
+SWAP
+PUSHINT 256
+DICTUDEL
+DROP
+; colValue
+NIP
+SETGLOB 11
+; end colValue
+;; push identifier atomicSwap
+DUP
+DUP
+ISNULL
+THROWIF 63
+TRUE
+NEWC
+STSLICECONST x6_
+STI 1
+PUSHINT 3
+STZEROES
+STSLICE
+PUSHSLICE x405f5e100000000000000000000000000004_
+STSLICER
+STSLICECONST 0
+;; Remote call IAtomicSwap.destruct
+STSLICECONST 0
+STSLICECONST x47c62dda
+ENDC
+PUSHINT 1
+SENDRAWMSG
+DROP
+; end function destruct
+DROP
+; end modifier onlyOwnerAndAccept
+
 .globl	onRedeem
 .public	onRedeem
 .type	onRedeem, @function
@@ -647,6 +1081,23 @@ THROWIF 63
 GETGLOB 9
 SDEQ
 THROWIFNOT 409
+;; delete
+; expValue
+;; fetch participantAtomicSwaps
+GETGLOB 12
+;; push identifier secretHash
+PUSH S2
+SWAP
+; end expValue
+PUSH S1
+SWAP
+PUSHINT 256
+DICTUDEL
+DROP
+; colValue
+NIP
+SETGLOB 12
+; end colValue
 ;; emit OnRedeemed
 NEWC
 PUSHSLICE xc0000000000000000000000002_
@@ -699,6 +1150,23 @@ THROWIF 63
 GETGLOB 9
 SDEQ
 THROWIFNOT 409
+;; delete
+; expValue
+;; fetch participantAtomicSwaps
+GETGLOB 12
+;; push identifier secretHash
+PUSH S2
+SWAP
+; end expValue
+PUSH S1
+SWAP
+PUSHINT 256
+DICTUDEL
+DROP
+; colValue
+NIP
+SETGLOB 12
+; end colValue
 ;; emit OnRedeemed
 NEWC
 PUSHSLICE xc0000000000000000000000002_
@@ -759,6 +1227,23 @@ THROWIF 63
 GETGLOB 9
 SDEQ
 THROWIFNOT 411
+;; delete
+; expValue
+;; fetch initiatorAtomicSwaps
+GETGLOB 11
+;; push identifier secretHash
+PUSH S2
+SWAP
+; end expValue
+PUSH S1
+SWAP
+PUSHINT 256
+DICTUDEL
+DROP
+; colValue
+NIP
+SETGLOB 11
+; end colValue
 ;; emit OnRefunded
 NEWC
 PUSHSLICE xc0000000000000000000000002_
@@ -811,6 +1296,23 @@ THROWIF 63
 GETGLOB 9
 SDEQ
 THROWIFNOT 411
+;; delete
+; expValue
+;; fetch initiatorAtomicSwaps
+GETGLOB 11
+;; push identifier secretHash
+PUSH S2
+SWAP
+; end expValue
+PUSH S1
+SWAP
+PUSHINT 256
+DICTUDEL
+DROP
+; colValue
+NIP
+SETGLOB 11
+; end colValue
 ;; emit OnRefunded
 NEWC
 PUSHSLICE xc0000000000000000000000002_
@@ -832,185 +1334,71 @@ SENDRAWMSG
 DROP2
 ; end function onRefund
 
-.globl	onInitiate
-.public	onInitiate
-.type	onInitiate, @function
-GETGLOB 1
-ISNULL
+.globl	hashSecret
+.public	hashSecret
+.type	hashSecret, @function
+; Decode input parameters
+; Decode secret
+LDREF
+ENDS
+;; param: secret
+; function hashSecret
+;; return
+;; push identifier secret
+DUP
+CTOS
+SHA256U
+;; uint256
+UFITS 256
+NIP
+;; emitting 1 value(s)
+PUSH S1
+EQINT -1
 PUSHCONT {
-	CALL $c4_to_c7$
+	PUSH S3
+	CTOS
+	LDU 2
+	LDMSGADDR
+	DROP
+	NIP
+	NEWC
+	STSLICECONST xc
+	STSLICE
+	PUSHINT 96
+	STZEROES
+	STSLICECONST 0
+	STSLICECONST 0
+	STSLICECONST xa589af14
+	PUSH S1
+	STUR 256
+	ENDC
+	PUSHINT 1
+	SENDRAWMSG
 }
 IF
-; Decode input parameters
-; Decode secretHash
-LDU 256
-ENDS
-;; param: secretHash
-; function onInitiate
-;; transfer()
-;; get member sender
-GETGLOB 9
-NEWC
-STSLICECONST x42_
-STSLICE
-PUSHINT 109
-STZEROES
-STSLICECONST 0
-STSLICECONST 0
-ENDC
-PUSHINT 64
-SENDRAWMSG
-;; emit OnInitiate
-NEWC
-PUSHSLICE xc0000000000000000000000002_
-STSLICER
-STSLICECONST 0
-STSLICECONST 0
-STSLICECONST x443b3bc4
-;; secretHash
-;; push identifier secretHash
-PUSH S1
-STUR 256
-;; atomicSwap
-;; get member sender
-GETGLOB 9
-STSLICER
-ENDC
-PUSHINT 1
-SENDRAWMSG
 DROP
-; end function onInitiate
-CALL $c7_to_c4$
+; end function hashSecret
+EQINT -1
+PUSHCONT {
+	CALL $c7_to_c4$
+}
+IF
 TRUE
 SETGLOB 7
 
-.globl	onInitiate_internal
-.type	onInitiate_internal, @function
-;; param: secretHash
-; function onInitiate
-;; transfer()
-;; get member sender
-GETGLOB 9
-NEWC
-STSLICECONST x42_
-STSLICE
-PUSHINT 109
-STZEROES
-STSLICECONST 0
-STSLICECONST 0
-ENDC
-PUSHINT 64
-SENDRAWMSG
-;; emit OnInitiate
-NEWC
-PUSHSLICE xc0000000000000000000000002_
-STSLICER
-STSLICECONST 0
-STSLICECONST 0
-STSLICECONST x443b3bc4
-;; secretHash
-;; push identifier secretHash
-PUSH S1
-STUR 256
-;; atomicSwap
-;; get member sender
-GETGLOB 9
-STSLICER
-ENDC
-PUSHINT 1
-SENDRAWMSG
-DROP
-; end function onInitiate
-
-.globl	onParticipate
-.public	onParticipate
-.type	onParticipate, @function
-GETGLOB 1
-ISNULL
-PUSHCONT {
-	CALL $c4_to_c7$
-}
-IF
-; Decode input parameters
-; Decode secretHash
-LDU 256
-ENDS
-;; param: secretHash
-; function onParticipate
-;; transfer()
-;; get member sender
-GETGLOB 9
-NEWC
-STSLICECONST x42_
-STSLICE
-PUSHINT 109
-STZEROES
-STSLICECONST 0
-STSLICECONST 0
-ENDC
-PUSHINT 64
-SENDRAWMSG
-;; emit OnParticipate
-NEWC
-PUSHSLICE xc0000000000000000000000002_
-STSLICER
-STSLICECONST 0
-STSLICECONST 0
-STSLICECONST x1911ce72
-;; secretHash
-;; push identifier secretHash
-PUSH S1
-STUR 256
-;; atomicSwap
-;; get member sender
-GETGLOB 9
-STSLICER
-ENDC
-PUSHINT 1
-SENDRAWMSG
-DROP
-; end function onParticipate
-CALL $c7_to_c4$
-TRUE
-SETGLOB 7
-
-.globl	onParticipate_internal
-.type	onParticipate_internal, @function
-;; param: secretHash
-; function onParticipate
-;; transfer()
-;; get member sender
-GETGLOB 9
-NEWC
-STSLICECONST x42_
-STSLICE
-PUSHINT 109
-STZEROES
-STSLICECONST 0
-STSLICECONST 0
-ENDC
-PUSHINT 64
-SENDRAWMSG
-;; emit OnParticipate
-NEWC
-PUSHSLICE xc0000000000000000000000002_
-STSLICER
-STSLICECONST 0
-STSLICECONST 0
-STSLICECONST x1911ce72
-;; secretHash
-;; push identifier secretHash
-PUSH S1
-STUR 256
-;; atomicSwap
-;; get member sender
-GETGLOB 9
-STSLICER
-ENDC
-PUSHINT 1
-SENDRAWMSG
-DROP
-; end function onParticipate
+.globl	hashSecret_internal
+.type	hashSecret_internal, @function
+;; param: secret
+; function hashSecret
+;; return
+;; push identifier secret
+DUP
+CTOS
+SHA256U
+;; uint256
+UFITS 256
+NIP
+; end function hashSecret
 
 .globl	c7_to_c4
 .type	c7_to_c4, @function

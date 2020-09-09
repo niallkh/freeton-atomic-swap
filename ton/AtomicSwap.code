@@ -759,13 +759,6 @@ GETGLOB 9
 GETGLOB 10
 SDEQ
 THROWIFNOT 401
-; modifier onlyOwner
-;; get member sender
-GETGLOB 9
-;; push identifier owner
-GETGLOB 10
-SDEQ
-THROWIFNOT 401
 ; modifier whenExpired
 ;; get member createdAt
 DEPTH
@@ -819,7 +812,6 @@ SENDRAWMSG
 ; end function destruct
 ; end modifier whenRedeemedOrRefunded
 ; end modifier whenExpired
-; end modifier onlyOwner
 ; end modifier onlyOwner
 CALL $c7_to_c4$
 TRUE
@@ -834,13 +826,6 @@ GETGLOB 9
 GETGLOB 10
 SDEQ
 THROWIFNOT 401
-; modifier onlyOwner
-;; get member sender
-GETGLOB 9
-;; push identifier owner
-GETGLOB 10
-SDEQ
-THROWIFNOT 401
 ; modifier whenExpired
 ;; get member createdAt
 DEPTH
@@ -894,7 +879,6 @@ SENDRAWMSG
 ; end function destruct
 ; end modifier whenRedeemedOrRefunded
 ; end modifier whenExpired
-; end modifier onlyOwner
 ; end modifier onlyOwner
 
 .globl	params
@@ -921,40 +905,44 @@ PUSHINT 0
 PUSHINT 0
 ;; ret param: _balance
 PUSHINT 0
+;; ret param: _redeemed
+PUSHINT 0
+;; ret param: _refunded
+PUSHINT 0
 ; expValue
 ; end expValue
 ;; push identifier owner
 GETGLOB 10
 ; colValue
-POP s6
+POP s8
 ; end colValue
 ; expValue
 ; end expValue
 ;; push identifier participant
 GETGLOB 11
 ; colValue
-POP s5
+POP s7
 ; end colValue
 ; expValue
 ; end expValue
 ;; push identifier expiredTime
 GETGLOB 12
 ; colValue
-POP s4
+POP s6
 ; end colValue
 ; expValue
 ; end expValue
 ;; push identifier secretHash
 GETGLOB 14
 ; colValue
-POP s3
+POP s5
 ; end colValue
 ; expValue
 ; end expValue
 ;; push identifier amount
 GETGLOB 13
 ; colValue
-POP s2
+POP s4
 ; end colValue
 ;; get member balance
 GETPARAM 7
@@ -962,14 +950,28 @@ INDEX 0
 ; expValue
 ; end expValue
 ; colValue
+POP s3
+; end colValue
+; expValue
+; end expValue
+;; push identifier redeemed
+GETGLOB 15
+; colValue
+POP s2
+; end colValue
+; expValue
+; end expValue
+;; push identifier refunded
+GETGLOB 16
+; colValue
 NIP
 ; end colValue
 ;; returning named params
-;; emitting 6 value(s)
-PUSH S6
+;; emitting 8 value(s)
+PUSH S8
 EQINT -1
 PUSHCONT {
-	PUSH S8
+	PUSH S10
 	CTOS
 	LDU 2
 	LDMSGADDR
@@ -983,20 +985,24 @@ PUSHCONT {
 	STSLICECONST 0
 	STSLICECONST 1
 	NEWC
-	STSLICECONST xa49b8262
+	STSLICECONST xf19ae034
+	PUSH S9
+	STSLICER
+	PUSH S8
+	STSLICER
 	PUSH S7
-	STSLICER
-	PUSH S6
-	STSLICER
-	PUSH S5
 	STUR 32
-	PUSH S4
+	PUSH S6
 	STUR 256
 	NEWC
-	PUSH S4
+	PUSH S6
 	STUR 128
-	PUSH S3
+	PUSH S5
 	STUR 256
+	PUSH S4
+	STIR 1
+	PUSH S3
+	STIR 1
 	STBREFR
 	STBREFR
 	ENDC
@@ -1004,7 +1010,7 @@ PUSHCONT {
 	SENDRAWMSG
 }
 IF
-BLKDROP 6
+BLKDROP 8
 ; end function params
 EQINT -1
 PUSHCONT {
@@ -1029,46 +1035,64 @@ PUSHINT 0
 PUSHINT 0
 ;; ret param: _balance
 PUSHINT 0
+;; ret param: _redeemed
+PUSHINT 0
+;; ret param: _refunded
+PUSHINT 0
 ; expValue
 ; end expValue
 ;; push identifier owner
 GETGLOB 10
 ; colValue
-POP s6
+POP s8
 ; end colValue
 ; expValue
 ; end expValue
 ;; push identifier participant
 GETGLOB 11
 ; colValue
-POP s5
+POP s7
 ; end colValue
 ; expValue
 ; end expValue
 ;; push identifier expiredTime
 GETGLOB 12
 ; colValue
-POP s4
+POP s6
 ; end colValue
 ; expValue
 ; end expValue
 ;; push identifier secretHash
 GETGLOB 14
 ; colValue
-POP s3
+POP s5
 ; end colValue
 ; expValue
 ; end expValue
 ;; push identifier amount
 GETGLOB 13
 ; colValue
-POP s2
+POP s4
 ; end colValue
 ;; get member balance
 GETPARAM 7
 INDEX 0
 ; expValue
 ; end expValue
+; colValue
+POP s3
+; end colValue
+; expValue
+; end expValue
+;; push identifier redeemed
+GETGLOB 15
+; colValue
+POP s2
+; end colValue
+; expValue
+; end expValue
+;; push identifier refunded
+GETGLOB 16
 ; colValue
 NIP
 ; end colValue
