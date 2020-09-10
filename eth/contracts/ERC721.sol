@@ -1,6 +1,6 @@
-pragma solidity>=0.7.0;
+pragma solidity>=0.5.0;
 
-interface IERC721 is IERC165 {
+interface ERC721 {
 
     function balanceOf(address owner) external view returns (uint256 balance);
     function ownerOf(uint256 tokenId) external view returns (address owner);

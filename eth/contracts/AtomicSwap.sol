@@ -1,4 +1,4 @@
-pragma solidity>=0.7.0;
+pragma solidity>=0.5.0;
 
 import "./ERC20.sol";
 import "./ERC721.sol";
@@ -11,7 +11,7 @@ contract AtomicSwap {
         SwapType swapType;
         address initiator;
         address participant;
-        uint256 timelock;
+        uint256 timeLock;
         uint256 value;
         address tokenAddr;
         bool exists;
@@ -20,6 +20,7 @@ contract AtomicSwap {
     mapping(uint256 => Swap) atomicSwaps;
 
     event AtomicSwapCreated(
+        SwapType swapType,
         address initiator, 
         address participant, 
         uint256 secretHash, 
@@ -28,7 +29,7 @@ contract AtomicSwap {
     );
 
     event Redeemd(
-        uint256 secret,         
+        bytes secret,         
         uint256 secretHash,
         uint256 time,
         address addr
@@ -45,34 +46,34 @@ contract AtomicSwap {
         require(participant != address(0), "Invalid Participant");
         require(msg.sender != participant, "Initiator and participant should be different");
         require(msg.value == value, "Value with message lt value");
-        require(now > timelock, "Timelock is expired");
+        require(now > timeLock, "Timelock is expired");
         require(value > 0, "value should be gt 0");
 
-        atomicSwaps[secretHash] = new Swap({
+        atomicSwaps[secretHash] = Swap({
             swapType: SwapType.ETH,
             initiator: msg.sender,
             participant: participant,
-            timelock: timeLock,
+            timeLock: timeLock,
             value: value,
             tokenAddr: address(0),
             exists: true
         });
 
-        emit AtomicSwapCreated(msg.sender, participant, secretHash, value, address(0));
+        emit AtomicSwapCreated(SwapType.ETH, msg.sender, participant, secretHash, value, address(0));
     }
 
     function createSwapErc20(uint256 secretHash, address participant, uint256 value, uint256 timeLock, address tokenAddr) external {
         require(!atomicSwaps[secretHash].exists, "Atom Swap already created");
         require(participant != address(0), "Invalid Participant");
         require(msg.sender != participant, "Initiator and participant should be different");
-        require(now > timelock, "Timelock is expired");
+        require(now > timeLock, "Timelock is expired");
         require(value > 0, "value should be gt 0");
 
-        atomicSwaps[secretHash] = new Swap({
+        atomicSwaps[secretHash] = Swap({
             swapType: SwapType.ERC20,
             initiator: msg.sender,
             participant: participant,
-            timelock: timeLock,
+            timeLock: timeLock,
             value: value,
             tokenAddr: tokenAddr,
             exists: true
@@ -82,36 +83,35 @@ contract AtomicSwap {
         require(erc20.allowance(msg.sender, address(this)) >= value, "You should allow erc20 tokens for Atomic Swap");
         require(erc20.transferFrom(msg.sender, address(this), value), "Couldn't transfer token to Atomic Swap");
 
-        emit AtomicSwapCreated(msg.sender, participant, secretHash, value, tokenAddr);
+        emit AtomicSwapCreated(SwapType.ERC20, msg.sender, participant, secretHash, value, tokenAddr);
     }
 
-    function createSwapErc721(uint256 secretHash, address participant, uint256 tokenId, uint256 timeLock, address erc721Addr) external {
+    function createSwapErc721(uint256 secretHash, address participant, uint256 tokenId, uint256 timeLock, address tokenAddr) external {
         require(!atomicSwaps[secretHash].exists, "Atom Swap already created");
         require(participant != address(0), "Invalid Participant");
         require(msg.sender != participant, "Initiator and participant should be different");
-        require(now > timelock, "Timelock is expired");
-        require(value > 0, "value should be gt 0");
+        require(now > timeLock, "Timelock is expired");
 
-        atomicSwaps[secretHash] = new Swap({
+        atomicSwaps[secretHash] = Swap({
             swapType: SwapType.ERC721,
             initiator: msg.sender,
             participant: participant,
-            timelock: timeLock,
-            value: value,
+            timeLock: timeLock,
+            value: tokenId,
             tokenAddr: tokenAddr,
             exists: true
         });
         
         ERC721 erc721 = ERC721(tokenAddr);
-        erc721.safeTransferFrom(msg.sender, address(this), value);
+        erc721.safeTransferFrom(msg.sender, address(this), tokenId);
 
-        emit AtomicSwapCreated(msg.sender, participant, secretHash, value, tokenAddr);
+        emit AtomicSwapCreated(SwapType.ERC721, msg.sender, participant, secretHash, tokenId, tokenAddr);
     }
 
-    function redeem(bytes secret) external {
+    function redeem(bytes calldata secret) external {
         uint256 secretHash = hashSecret(secret);
         require(atomicSwaps[secretHash].exists, "Atom Swap isn't created");
-        require(atomicSwaps[secretHash].timelock >= now, "Atomic swap expired");
+        require(atomicSwaps[secretHash].timeLock >= now, "Atomic swap expired");
         require(atomicSwaps[secretHash].participant == msg.sender, "Redeem can only participant");
 
         Swap memory swap = atomicSwaps[secretHash];
@@ -126,15 +126,16 @@ contract AtomicSwap {
             erc721.safeTransferFrom(address(this), swap.participant, swap.value);
 
         } else {
-            swap.participant.transfer(swap.value);
+            address payable participant = address(uint160(swap.participant));
+            participant.transfer(swap.value);
         }
 
-        emit Redeemd(secretHash, now, swap.participant);
+        emit Redeemd(secret, secretHash, now, swap.participant);
     }
 
     function refund(uint256 secretHash) external {
         require(atomicSwaps[secretHash].exists, "Atom Swap isn't created");
-        require(atomicSwaps[secretHash].timelock < now, "Atomic swap isn't expired");
+        require(atomicSwaps[secretHash].timeLock < now, "Atomic swap isn't expired");
         require(atomicSwaps[secretHash].initiator == msg.sender, "Refund can only initiator");
 
         Swap memory swap = atomicSwaps[secretHash];
@@ -149,7 +150,8 @@ contract AtomicSwap {
             erc721.safeTransferFrom(address(this), swap.initiator, swap.value);
 
         } else {
-            swap.initiator.transfer(swap.value);
+            address payable initiator = address(uint160(swap.initiator));
+            initiator.transfer(swap.value);
         }
 
         emit Refunded(secretHash, now, swap.initiator);
@@ -158,21 +160,21 @@ contract AtomicSwap {
     function params(uint256 secretHash) public view returns (
         address initiator,
         address participant,
-        uint256 timelock,
+        uint256 timeLock,
         uint256 value,
-        uint256 tokenAddr,
+        address tokenAddr,
         SwapType swapType
     ) {
         require(atomicSwaps[secretHash].exists, "Atom Swap isn't created");
         initiator = atomicSwaps[secretHash].initiator;
         participant = atomicSwaps[secretHash].participant;
-        timeLock = atomicSwaps[secretHash].timelock;
+        timeLock = atomicSwaps[secretHash].timeLock;
         value = atomicSwaps[secretHash].value;
         tokenAddr = atomicSwaps[secretHash].tokenAddr;
         swapType = atomicSwaps[secretHash].swapType;
     }
 
-    function hashSecret(bytes secret) public pure returns (uint256) {
+    function hashSecret(bytes memory secret) public pure returns (uint256) {
         return uint256(sha256(secret));
     }
 }
