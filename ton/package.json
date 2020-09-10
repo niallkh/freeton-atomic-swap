@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha",
-    "ton-compile": "sh scripts/ton-compile.sh AtomicSwap && sh scripts/ton-compile.sh AtomicSwapWallet"
+    "build": "sh ./compile.sh AtomicSwap && sh ./compile.sh AtomicSwapWallet"
   },
   "keywords": [],
   "author": "",

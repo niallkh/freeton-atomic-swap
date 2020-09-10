@@ -162,7 +162,7 @@ STSLICER
 ;; push identifier amount
 PUSH S7
 STUR 128
-;; _time
+;; timeLock
 ;; push identifier time
 PUSH S6
 STUR 32
@@ -298,7 +298,7 @@ STSLICER
 ;; push identifier amount
 PUSH S7
 STUR 128
-;; _time
+;; timeLock
 ;; push identifier time
 PUSH S6
 STUR 32
@@ -569,20 +569,9 @@ PUSHCONT {
 IF
 ; Decode input parameters
 ; Decode secret
-LDU 256
-; Decode secretHash
-LDUQ 256
-PUSHCONT {
-	;; load next cell
-	LDREF
-	ENDS
-	CTOS
-	LDU 256
-}
-IFNOT
+LDREF
 ENDS
 ;; param: secret
-;; param: secretHash
 ; modifier onlyOwnerAndAccept
 GETGLOB 5
 DUP
@@ -598,6 +587,10 @@ EQUAL
 THROWIFNOT 100
 ACCEPT
 ; function redeem
+;; push identifier secret
+DUP
+CALL $hashSecret_internal$
+;; decl: secretHash
 ;; map.fetch
 ;; push identifier secretHash
 DUP
@@ -613,25 +606,8 @@ DUP
 ISNULL
 NOT
 THROWIFNOT 406
-NEWC
-;; push identifier secret
-PUSH S3
-STUR 256
-ENDC
-CTOS
-SHA256U
-;; uint256
-UFITS 256
-;; decl: computed_hash
-;; push identifier computed_hash
-DUP
-;; push identifier secretHash
-PUSH S3
-;; ==
-EQUAL
-THROWIFNOT 413
 ;; push identifier atomicSwap
-PUSH S1
+DUP
 DUP
 ISNULL
 THROWIF 63
@@ -647,17 +623,17 @@ STSLICER
 STSLICECONST 0
 ;; Remote call IAtomicSwap.redeem
 STSLICECONST 0
-STSLICECONST x36f8d75c
+STSLICECONST x6bcd3dbc
 ;; secret
 ;; push identifier secret
-PUSH S4
-STUR 256
+PUSH S3
+STREFR
 ENDC
 PUSHINT 1
 SENDRAWMSG
 DROP2
 ; end function redeem
-DROP2
+DROP
 ; end modifier onlyOwnerAndAccept
 CALL $c7_to_c4$
 TRUE
@@ -666,7 +642,6 @@ SETGLOB 7
 .globl	redeem_internal
 .type	redeem_internal, @function
 ;; param: secret
-;; param: secretHash
 ; modifier onlyOwnerAndAccept
 GETGLOB 5
 DUP
@@ -682,6 +657,10 @@ EQUAL
 THROWIFNOT 100
 ACCEPT
 ; function redeem
+;; push identifier secret
+DUP
+CALL $hashSecret_internal$
+;; decl: secretHash
 ;; map.fetch
 ;; push identifier secretHash
 DUP
@@ -697,25 +676,8 @@ DUP
 ISNULL
 NOT
 THROWIFNOT 406
-NEWC
-;; push identifier secret
-PUSH S3
-STUR 256
-ENDC
-CTOS
-SHA256U
-;; uint256
-UFITS 256
-;; decl: computed_hash
-;; push identifier computed_hash
-DUP
-;; push identifier secretHash
-PUSH S3
-;; ==
-EQUAL
-THROWIFNOT 413
 ;; push identifier atomicSwap
-PUSH S1
+DUP
 DUP
 ISNULL
 THROWIF 63
@@ -731,17 +693,17 @@ STSLICER
 STSLICECONST 0
 ;; Remote call IAtomicSwap.redeem
 STSLICECONST 0
-STSLICECONST x36f8d75c
+STSLICECONST x6bcd3dbc
 ;; secret
 ;; push identifier secret
-PUSH S4
-STUR 256
+PUSH S3
+STREFR
 ENDC
 PUSHINT 1
 SENDRAWMSG
 DROP2
 ; end function redeem
-DROP2
+DROP
 ; end modifier onlyOwnerAndAccept
 
 .globl	refund
@@ -1548,7 +1510,7 @@ PUSHCONT {
 		;; if
 		;; push identifier functionId
 		DUP
-		PUSHINT 922277724
+		PUSHINT 1808612796
 		;; ==
 		EQUAL
 		PUSHCONT {

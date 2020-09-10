@@ -26,7 +26,7 @@ PUSHCONT {
 	LDU 128
 }
 IFNOT
-; Decode _time
+; Decode timeLock
 LDUQ 32
 PUSHCONT {
 	;; load next cell
@@ -39,7 +39,7 @@ IFNOT
 ENDS
 ;; param: _participant
 ;; param: _amount
-;; param: _time
+;; param: timeLock
 ; constructor AtomicSwap
 ;; !
 ;; address.isNone()
@@ -64,7 +64,7 @@ PUSH S3
 SDEQ
 NOT
 THROWIFNOT 409
-;; push identifier _time
+;; push identifier timeLock
 DUP
 GTINT 0
 THROWIFNOT 410
@@ -125,7 +125,7 @@ PUSHCONT {
 	BLKDROP 8
 }
 IFELSE
-;; push identifier _time
+;; push identifier timeLock
 PUSH S1
 ;; +
 ADD
@@ -206,7 +206,7 @@ PUSHCONT {
 IF
 ; Decode input parameters
 ; Decode secret
-LDU 256
+LDREF
 ENDS
 ;; param: secret
 ; modifier onlyParticipant
@@ -274,15 +274,9 @@ GETGLOB 13
 ;; >=
 GEQ
 THROWIFNOT 412
-NEWC
 ;; push identifier secret
-PUSH S1
-STUR 256
-ENDC
-CTOS
-SHA256U
-;; uint256
-UFITS 256
+DUP
+CALL $hashSecret_internal$
 ;; decl: computed_hash
 ;; push identifier computed_hash
 DUP
@@ -329,11 +323,11 @@ PUSHSLICE xc0000000000000000000000002_
 STSLICER
 STSLICECONST 0
 STSLICECONST 0
-STSLICECONST x1eb5cab6
+STSLICECONST x33e3ad3c
 ;; secret
 ;; push identifier secret
 PUSH S2
-STUR 256
+STREFR
 ;; addr
 ;; push identifier participant
 GETGLOB 11
@@ -423,15 +417,9 @@ GETGLOB 13
 ;; >=
 GEQ
 THROWIFNOT 412
-NEWC
 ;; push identifier secret
-PUSH S1
-STUR 256
-ENDC
-CTOS
-SHA256U
-;; uint256
-UFITS 256
+DUP
+CALL $hashSecret_internal$
 ;; decl: computed_hash
 ;; push identifier computed_hash
 DUP
@@ -478,11 +466,11 @@ PUSHSLICE xc0000000000000000000000002_
 STSLICER
 STSLICECONST 0
 STSLICECONST 0
-STSLICECONST x1eb5cab6
+STSLICECONST x33e3ad3c
 ;; secret
 ;; push identifier secret
 PUSH S2
-STUR 256
+STREFR
 ;; addr
 ;; push identifier participant
 GETGLOB 11
@@ -759,39 +747,6 @@ GETGLOB 9
 GETGLOB 10
 SDEQ
 THROWIFNOT 401
-; modifier whenExpired
-;; get member createdAt
-DEPTH
-PUSHINT 5
-SUB
-PICK
-PUSHCONT {
-	PUSHINT 0
-}
-PUSHCONT {
-	DEPTH
-	PUSHINT 3
-	SUB
-	PICK
-	CTOS
-	LDU 4
-	LDMSGADDR
-	LDMSGADDR
-	LDGRAMS
-	LDDICT
-	LDGRAMS
-	LDGRAMS
-	LDU 64
-	PLDU 32
-	XCHG S8
-	BLKDROP 8
-}
-IFELSE
-;; push identifier expiredTime
-GETGLOB 12
-;; >=
-GEQ
-THROWIFNOT 403
 ; modifier whenRedeemedOrRefunded
 ;; push identifier redeemed
 GETGLOB 15
@@ -811,7 +766,6 @@ PUSHINT 160
 SENDRAWMSG
 ; end function destruct
 ; end modifier whenRedeemedOrRefunded
-; end modifier whenExpired
 ; end modifier onlyOwner
 CALL $c7_to_c4$
 TRUE
@@ -826,39 +780,6 @@ GETGLOB 9
 GETGLOB 10
 SDEQ
 THROWIFNOT 401
-; modifier whenExpired
-;; get member createdAt
-DEPTH
-PUSHINT 5
-SUB
-PICK
-PUSHCONT {
-	PUSHINT 0
-}
-PUSHCONT {
-	DEPTH
-	PUSHINT 3
-	SUB
-	PICK
-	CTOS
-	LDU 4
-	LDMSGADDR
-	LDMSGADDR
-	LDGRAMS
-	LDDICT
-	LDGRAMS
-	LDGRAMS
-	LDU 64
-	PLDU 32
-	XCHG S8
-	BLKDROP 8
-}
-IFELSE
-;; push identifier expiredTime
-GETGLOB 12
-;; >=
-GEQ
-THROWIFNOT 403
 ; modifier whenRedeemedOrRefunded
 ;; push identifier redeemed
 GETGLOB 15
@@ -878,7 +799,6 @@ PUSHINT 160
 SENDRAWMSG
 ; end function destruct
 ; end modifier whenRedeemedOrRefunded
-; end modifier whenExpired
 ; end modifier onlyOwner
 
 .globl	params
@@ -1098,6 +1018,72 @@ NIP
 ; end colValue
 ;; returning named params
 ; end function params
+
+.globl	hashSecret
+.public	hashSecret
+.type	hashSecret, @function
+; Decode input parameters
+; Decode secret
+LDREF
+ENDS
+;; param: secret
+; function hashSecret
+;; return
+;; push identifier secret
+DUP
+CTOS
+SHA256U
+;; uint256
+UFITS 256
+NIP
+;; emitting 1 value(s)
+PUSH S1
+EQINT -1
+PUSHCONT {
+	PUSH S3
+	CTOS
+	LDU 2
+	LDMSGADDR
+	DROP
+	NIP
+	NEWC
+	STSLICECONST xc
+	STSLICE
+	PUSHINT 96
+	STZEROES
+	STSLICECONST 0
+	STSLICECONST 0
+	STSLICECONST xa589af14
+	PUSH S1
+	STUR 256
+	ENDC
+	PUSHINT 1
+	SENDRAWMSG
+}
+IF
+DROP
+; end function hashSecret
+EQINT -1
+PUSHCONT {
+	CALL $c7_to_c4$
+}
+IF
+TRUE
+SETGLOB 7
+
+.globl	hashSecret_internal
+.type	hashSecret_internal, @function
+;; param: secret
+; function hashSecret
+;; return
+;; push identifier secret
+DUP
+CTOS
+SHA256U
+;; uint256
+UFITS 256
+NIP
+; end function hashSecret
 
 .globl	c7_to_c4
 .type	c7_to_c4, @function

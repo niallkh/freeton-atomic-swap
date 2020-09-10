@@ -11,7 +11,7 @@ const abi = {
 			"inputs": [
 				{"name":"_participant","type":"address"},
 				{"name":"_amount","type":"uint128"},
-				{"name":"_time","type":"uint32"}
+				{"name":"timeLock","type":"uint32"}
 			],
 			"outputs": [
 			]
@@ -19,7 +19,7 @@ const abi = {
 		{
 			"name": "redeem",
 			"inputs": [
-				{"name":"secret","type":"uint256"}
+				{"name":"secret","type":"bytes"}
 			],
 			"outputs": [
 			]
@@ -52,6 +52,15 @@ const abi = {
 				{"name":"_redeemed","type":"bool"},
 				{"name":"_refunded","type":"bool"}
 			]
+		},
+		{
+			"name": "hashSecret",
+			"inputs": [
+				{"name":"secret","type":"bytes"}
+			],
+			"outputs": [
+				{"name":"value0","type":"uint256"}
+			]
 		}
 	],
 	"data": [
@@ -61,7 +70,7 @@ const abi = {
 		{
 			"name": "Redeemed",
 			"inputs": [
-				{"name":"secret","type":"uint256"},
+				{"name":"secret","type":"bytes"},
 				{"name":"addr","type":"address"},
 				{"name":"time","type":"uint256"}
 			],
@@ -82,7 +91,7 @@ const abi = {
 
 const pkg = {
     abi,
-    imageBase64: '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',
+    imageBase64: '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',
 };
 
 class AtomicSwapContract {
@@ -103,7 +112,7 @@ class AtomicSwapContract {
      * @param {object} constructorParams
      * @param {string} constructorParams._participant (address)
      * @param {uint128} constructorParams._amount
-     * @param {number} constructorParams._time (uint32)
+     * @param {number} constructorParams.timeLock (uint32)
      * @param {object} initParams
      * @param {string} initParams.secretHash (uint256)
      */
@@ -153,7 +162,7 @@ class AtomicSwapContract {
 
     /**
      * @param {object} params
-     * @param {string} params.secret (uint256)
+     * @param {bytes} params.secret
      */
     redeem(params) {
         return this.run('redeem', params);
@@ -161,7 +170,7 @@ class AtomicSwapContract {
 
     /**
      * @param {object} params
-     * @param {string} params.secret (uint256)
+     * @param {bytes} params.secret
      */
     redeemLocal(params) {
         return this.runLocal('redeem', params);
@@ -216,6 +225,30 @@ class AtomicSwapContract {
      */
     paramsLocal() {
         return this.runLocal('params', {});
+    }
+
+    /**
+     * @typedef AtomicSwapContract_hashSecret
+     * @type {object}
+     * @property {string} value0  (uint256)
+     */
+
+    /**
+     * @param {object} params
+     * @param {bytes} params.secret
+     * @return {Promise.<AtomicSwapContract_hashSecret>}
+     */
+    hashSecret(params) {
+        return this.run('hashSecret', params);
+    }
+
+    /**
+     * @param {object} params
+     * @param {bytes} params.secret
+     * @return {Promise.<AtomicSwapContract_hashSecret>}
+     */
+    hashSecretLocal(params) {
+        return this.runLocal('hashSecret', params);
     }
 
 }

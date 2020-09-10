@@ -17,7 +17,7 @@ contract AtomicSwap is IAtomicSwap {
     bool redeemed;
     bool refunded;
 
-    event Redeemed(uint256 secret, address addr, uint256 time);
+    event Redeemed(bytes secret, address addr, uint256 time);
     event Refunded(address addr, uint256 time);
 
     modifier onlyOwner() {
@@ -62,9 +62,9 @@ contract AtomicSwap is IAtomicSwap {
         IAtomicSwapWallet(_participant).onParticipate { value: 100_000_000, bounce: true, flag: 1 } (secretHash); // fixme check bounce
     }
 
-    function redeem(uint256 secret) external override onlyParticipant whenNotExpired whenNotRedeemedAndNotRefunded {
+    function redeem(bytes secret) external override onlyParticipant whenNotExpired whenNotRedeemedAndNotRefunded {
         require(address(this).balance >= amount, 412);
-        uint256 computed_hash = uint256(sha256(abi.encodePacked(secret)));
+        uint256 computed_hash = hashSecret(secret);
         require(computed_hash == secretHash, 413);
         redeemed = true;
 
@@ -103,6 +103,10 @@ contract AtomicSwap is IAtomicSwap {
         _balance = address(this).balance;
         _redeemed = redeemed;
         _refunded = refunded;
+    }
+
+    function hashSecret(bytes secret) public pure returns (uint256) {
+        return uint256(sha256(secret));
     }
 
     onBounce(TvmSlice slice) external {

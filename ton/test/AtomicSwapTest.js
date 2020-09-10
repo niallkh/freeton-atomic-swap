@@ -1,8 +1,8 @@
 /* eslint-env mocha */
 const expect = require('chai').expect
 const getGramsFromGiver = require('./giver.js')
-const AtomicSwapWalletContract = require('../ton/AtomicSwapWalletContract.js')
-const AtomicSwapContract = require('../ton/AtomicSwapContract.js')
+const AtomicSwapWalletContract = require('../contracts/AtomicSwapWalletContract.js')
+const AtomicSwapContract = require('../contracts/AtomicSwapContract.js')
 const { TONClient } = require('ton-client-node-js')
 
 describe('Atomic Swap Wallet Test', function () {
@@ -224,8 +224,7 @@ describe('Atomic Swap Wallet Test', function () {
     it('redeem by participant', async () => {
 
         await participantContract.redeem({ 
-            secretHash,
-            secret: `0x${secret}`, 
+            secret: `${secret}`, 
         })
 
         {
@@ -242,7 +241,7 @@ describe('Atomic Swap Wallet Test', function () {
 
             expect(event.function).to.be.equal("Redeemed")
             expect(event.output.addr).to.be.equal(participantContract.address)
-            expect(event.output.secret).to.be.equal(`0x${secret}`)       
+            expect(event.output.secret).to.be.equal(`${secret}`)       
         }
 
         const participantBalance = (await client.queries.accounts.query({

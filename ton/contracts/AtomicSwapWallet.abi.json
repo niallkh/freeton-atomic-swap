@@ -41,8 +41,7 @@
 		{
 			"name": "redeem",
 			"inputs": [
-				{"name":"secret","type":"uint256"},
-				{"name":"secretHash","type":"uint256"}
+				{"name":"secret","type":"bytes"}
 			],
 			"outputs": [
 			]
