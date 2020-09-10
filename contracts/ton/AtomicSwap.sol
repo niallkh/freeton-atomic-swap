@@ -44,17 +44,17 @@ contract AtomicSwap is IAtomicSwap {
         require(redeemed, 406);_;        
     }
 
-    constructor(address _participant, uint128 _amount, uint32 _time) public {
+    constructor(address _participant, uint128 _amount, uint32 timeLock) public {
         require(!msg.sender.isNone(), 407);
         require(!_participant.isNone(), 408);
         require(msg.sender != _participant, 409);
-        require(_time > 0, 410);
+        require(timeLock > 0, 410);
         require(msg.value >= amount, 411);
         
         owner = msg.sender;
         participant = _participant;
         amount = _amount;
-        expiredTime = msg.createdAt + _time;
+        expiredTime = msg.createdAt + timeLock;
         redeemed = false;
         refunded = false;
 
@@ -69,6 +69,7 @@ contract AtomicSwap is IAtomicSwap {
         redeemed = true;
 
         IAtomicSwapWallet(participant).onRedeem { value: amount, bounce: true, flag: 64 } (secretHash);
+
         emit Redeemed(secret, participant, now);
     }
 
@@ -76,10 +77,11 @@ contract AtomicSwap is IAtomicSwap {
         refunded = true;
 
         IAtomicSwapWallet(owner).onRefund { value: amount, bounce: true, flag: 128 } (secretHash);
+        
         emit Refunded(owner, now);
     }
 
-    function destruct() external override onlyOwner whenExpired whenRedeemedOrRefunded {
+    function destruct() external override onlyOwner whenRedeemedOrRefunded {
         selfdestruct(owner);
     }
 

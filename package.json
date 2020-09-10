@@ -4,13 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "ton-compile": "sh scripts/ton-compile.sh AtomicSwap && sh scripts/ton-compile.sh AtomicSwapWallet"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "ton-client-node-js": "^0.26.0"
+    "ton-client-node-js": "^0.26.0",
+    "truffle": "^5.1.43"
   },
   "devDependencies": {
     "eslint": "^7.8.1",

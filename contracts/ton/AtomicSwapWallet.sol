@@ -70,12 +70,10 @@ contract AtomicSwapWallet is IAtomicSwapWallet {
         emit OnParticipate(secretHash, msg.sender);
     }
 
-    function redeem(uint256 secret, uint256 secretHash) external onlyOwnerAndAccept {
+    function redeem(bytes secret) external onlyOwnerAndAccept { // FIXME
+        uint256 secretHash = hashSecret(secret);
         optional(address) atomicSwap = participantAtomicSwaps.fetch(secretHash);
         require(atomicSwap.hasValue(), 406);
-
-        uint256 computed_hash = uint256(sha256(abi.encodePacked(secret)));
-        require(computed_hash == secretHash, 413);
 
         IAtomicSwap(atomicSwap.get()).redeem { value: 100_000_000, bounce: true, flag: 1 } (secret);
     }
