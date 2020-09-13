@@ -11,80 +11,36 @@
 			]
 		},
 		{
+			"name": "sendTransaction",
+			"inputs": [
+				{"name":"dest","type":"address"},
+				{"name":"value","type":"uint128"},
+				{"name":"bounce","type":"bool"},
+				{"name":"flags","type":"uint8"},
+				{"name":"payload","type":"cell"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "acceptTransfer",
+			"inputs": [
+				{"name":"payload","type":"bytes"}
+			],
+			"outputs": [
+			]
+		},
+		{
 			"name": "createSwap",
 			"inputs": [
+				{"name":"initiator","type":"address"},
 				{"name":"participant","type":"address"},
 				{"name":"amount","type":"uint128"},
-				{"name":"time","type":"uint32"},
+				{"name":"timeLock","type":"uint32"},
 				{"name":"data","type":"cell"}
 			],
 			"outputs": [
 				{"name":"value0","type":"address"}
-			]
-		},
-		{
-			"name": "onInitiate",
-			"inputs": [
-				{"name":"secretHash","type":"uint256"}
-			],
-			"outputs": [
-			]
-		},
-		{
-			"name": "onParticipate",
-			"inputs": [
-				{"name":"secretHash","type":"uint256"}
-			],
-			"outputs": [
-			]
-		},
-		{
-			"name": "redeem",
-			"inputs": [
-				{"name":"secret","type":"bytes"}
-			],
-			"outputs": [
-			]
-		},
-		{
-			"name": "refund",
-			"inputs": [
-				{"name":"secretHash","type":"uint256"}
-			],
-			"outputs": [
-			]
-		},
-		{
-			"name": "destruct",
-			"inputs": [
-				{"name":"secretHash","type":"uint256"}
-			],
-			"outputs": [
-			]
-		},
-		{
-			"name": "onRedeem",
-			"inputs": [
-				{"name":"secretHash","type":"uint256"}
-			],
-			"outputs": [
-			]
-		},
-		{
-			"name": "onRefund",
-			"inputs": [
-				{"name":"secretHash","type":"uint256"}
-			],
-			"outputs": [
-			]
-		},
-		{
-			"name": "hashSecret",
-			"inputs": [
-				{"name":"secret","type":"bytes"}
-			],
-			"outputs": [
-				{"name":"value0","type":"uint256"}
 			]
 		}
 	],
@@ -92,45 +48,9 @@
 	],
 	"events": [
 		{
-			"name": "OnParticipate",
+			"name": "TransferAccepted",
 			"inputs": [
-				{"name":"secretHash","type":"uint256"},
-				{"name":"atomicSwap","type":"address"}
-			],
-			"outputs": [
-			]
-		},
-		{
-			"name": "OnInitiate",
-			"inputs": [
-				{"name":"secretHash","type":"uint256"},
-				{"name":"atomicSwap","type":"address"}
-			],
-			"outputs": [
-			]
-		},
-		{
-			"name": "OnRedeemed",
-			"inputs": [
-				{"name":"secretHash","type":"uint256"},
-				{"name":"amount","type":"uint256"}
-			],
-			"outputs": [
-			]
-		},
-		{
-			"name": "OnRefunded",
-			"inputs": [
-				{"name":"secretHash","type":"uint256"},
-				{"name":"amount","type":"uint256"}
-			],
-			"outputs": [
-			]
-		},
-		{
-			"name": "Error",
-			"inputs": [
-				{"name":"code","type":"uint32"}
+				{"name":"payload","type":"bytes"}
 			],
 			"outputs": [
 			]

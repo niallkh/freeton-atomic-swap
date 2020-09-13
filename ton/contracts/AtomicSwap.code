@@ -14,8 +14,18 @@ PUSHINT 1
 SETGLOB 6
 ;; end constructor protection
 ; Decode input parameters
-; Decode _participant
+; Decode _initiator
 LDMSGADDR
+; Decode _participant
+LDMSGADDRQ
+PUSHCONT {
+	;; load next cell
+	LDREF
+	ENDS
+	CTOS
+	LDMSGADDR
+}
+IFNOT
 ; Decode _amount
 LDUQ 128
 PUSHCONT {
@@ -26,7 +36,7 @@ PUSHCONT {
 	LDU 128
 }
 IFNOT
-; Decode timeLock
+; Decode _timeLock
 LDUQ 32
 PUSHCONT {
 	;; load next cell
@@ -37,18 +47,19 @@ PUSHCONT {
 }
 IFNOT
 ENDS
+;; param: _initiator
 ;; param: _participant
 ;; param: _amount
-;; param: timeLock
+;; param: _timeLock
 ; constructor AtomicSwap
 ;; !
 ;; address.isNone()
-;; get member sender
-GETGLOB 9
+;; push identifier _initiator
+PUSH S3
 PUSHSLICE x2_
 SDEQ
 NOT
-THROWIFNOT 407
+THROWIFNOT 103
 ;; !
 ;; address.isNone()
 ;; push identifier _participant
@@ -56,29 +67,33 @@ PUSH S2
 PUSHSLICE x2_
 SDEQ
 NOT
-THROWIFNOT 408
-;; get member sender
-GETGLOB 9
-;; push identifier _participant
-PUSH S3
-SDEQ
-NOT
-THROWIFNOT 409
+THROWIFNOT 103
 ;; push identifier timeLock
+GETGLOB 12
+;; push identifier now
+NOW
+;; >
+GREATER
+;; short-circuiting &&
 DUP
-GTINT 0
-THROWIFNOT 410
-;; get member value
-CALL $message_balance_macro$
-;; push identifier amount
-GETGLOB 13
-;; >=
-GEQ
-THROWIFNOT 411
+PUSHCONT {
+	DROP
+	;; push identifier timeLock
+	GETGLOB 12
+	;; push identifier now
+	NOW
+	PUSHINT 604800
+	;; +
+	ADD
+	;; <
+	LESS
+}
+IF
+THROWIFNOT 104
 ; expValue
 ; end expValue
-;; get member sender
-GETGLOB 9
+;; push identifier _initiator
+PUSH S3
 ; colValue
 SETGLOB 10
 ; end colValue
@@ -98,55 +113,13 @@ SETGLOB 13
 ; end colValue
 ; expValue
 ; end expValue
-;; get member createdAt
-DEPTH
-PUSHINT 5
-SUB
-PICK
-PUSHCONT {
-	PUSHINT 0
-}
-PUSHCONT {
-	DEPTH
-	PUSHINT 3
-	SUB
-	PICK
-	CTOS
-	LDU 4
-	LDMSGADDR
-	LDMSGADDR
-	LDGRAMS
-	LDDICT
-	LDGRAMS
-	LDGRAMS
-	LDU 64
-	PLDU 32
-	XCHG S8
-	BLKDROP 8
-}
-IFELSE
-;; push identifier timeLock
-PUSH S1
-;; +
-ADD
-UFITS 32
+;; push identifier _timeLock
+DUP
 ; colValue
 SETGLOB 12
 ; end colValue
-; expValue
-; end expValue
-FALSE
-; colValue
-SETGLOB 15
-; end colValue
-; expValue
-; end expValue
-FALSE
-; colValue
-SETGLOB 16
-; end colValue
-;; get member sender
-GETGLOB 9
+;; push identifier participant
+GETGLOB 11
 TRUE
 NEWC
 STSLICECONST x6_
@@ -154,42 +127,23 @@ STI 1
 PUSHINT 3
 STZEROES
 STSLICE
-PUSHSLICE x405f5e100000000000000000000000000004_
+PUSHSLICE x30f4240000000000000000000000000004_
 STSLICER
 STSLICECONST 0
-;; Remote call IAtomicSwapWallet.onInitiate
+;; Remote call IAccept.acceptTransfer
 STSLICECONST 0
-STSLICECONST x04b1cc15
-;; secretHash
-;; push identifier secretHash
-GETGLOB 14
-STUR 256
-ENDC
-PUSHINT 1
-SENDRAWMSG
-;; push identifier _participant
-PUSH S2
-TRUE
+STSLICECONST x5a640cf4
+;; payload
+;; push identifier payload
+PUSHSLICE x41746f6d69632053776170
 NEWC
-STSLICECONST x6_
-STI 1
-PUSHINT 3
-STZEROES
 STSLICE
-PUSHSLICE x405f5e100000000000000000000000000004_
-STSLICER
-STSLICECONST 0
-;; Remote call IAtomicSwapWallet.onParticipate
-STSLICECONST 0
-STSLICECONST x61af095d
-;; secretHash
-;; push identifier secretHash
-GETGLOB 14
-STUR 256
+ENDC
+STREFR
 ENDC
 PUSHINT 1
 SENDRAWMSG
-BLKDROP 3
+BLKDROP 4
 ; end constructor AtomicSwap
 CALL $c7_to_c4$
 TRUE
@@ -209,62 +163,23 @@ IF
 LDREF
 ENDS
 ;; param: secret
-; modifier onlyParticipant
-;; get member sender
-GETGLOB 9
-;; push identifier participant
-GETGLOB 11
-SDEQ
-THROWIFNOT 402
 ; modifier whenNotExpired
-;; get member createdAt
-DEPTH
-PUSHINT 5
-SUB
-PICK
-PUSHCONT {
-	PUSHINT 0
-}
-PUSHCONT {
-	DEPTH
-	PUSHINT 3
-	SUB
-	PICK
-	CTOS
-	LDU 4
-	LDMSGADDR
-	LDMSGADDR
-	LDGRAMS
-	LDDICT
-	LDGRAMS
-	LDGRAMS
-	LDU 64
-	PLDU 32
-	XCHG S8
-	BLKDROP 8
-}
-IFELSE
-;; push identifier expiredTime
+;; push identifier now
+NOW
+;; push identifier timeLock
 GETGLOB 12
 ;; <
 LESS
-THROWIFNOT 404
-; modifier whenNotRedeemedAndNotRefunded
-;; !
-;; push identifier redeemed
-GETGLOB 15
-NOT
-;; short-circuiting &&
-DUP
-PUSHCONT {
-	DROP
-	;; !
-	;; push identifier refunded
-	GETGLOB 16
-	NOT
-}
-IF
-THROWIFNOT 405
+THROWIFNOT 101
+; modifier only
+;; push identifier participant
+GETGLOB 11
+;; get member sender
+GETGLOB 9
+;; push identifier addr
+PUSH S1
+SDEQ
+THROWIFNOT 102
 ; function redeem
 ;; get member balance
 GETPARAM 7
@@ -273,9 +188,9 @@ INDEX 0
 GETGLOB 13
 ;; >=
 GEQ
-THROWIFNOT 412
+THROWIFNOT 110
 ;; push identifier secret
-DUP
+PUSH S1
 CALL $hashSecret_internal$
 ;; decl: computed_hash
 ;; push identifier computed_hash
@@ -284,67 +199,39 @@ DUP
 GETGLOB 14
 ;; ==
 EQUAL
-THROWIFNOT 413
-; expValue
-; end expValue
-TRUE
-; colValue
-SETGLOB 15
-; end colValue
-;; push identifier amount
-GETGLOB 13
-;; push identifier participant
-GETGLOB 11
-TRUE
-NEWC
-STSLICECONST x6_
-STI 1
-PUSHINT 3
-STZEROES
-STSLICE
-SWAP
-STGRAMS
-PUSHINT 105
-STZEROES
-STSLICECONST 0
-;; Remote call IAtomicSwapWallet.onRedeem
-STSLICECONST 0
-STSLICECONST x5d04df71
-;; secretHash
-;; push identifier secretHash
-GETGLOB 14
-STUR 256
-ENDC
-PUSHINT 64
-SENDRAWMSG
+THROWIFNOT 109
 ;; emit Redeemed
 NEWC
 PUSHSLICE xc0000000000000000000000002_
 STSLICER
 STSLICECONST 0
 STSLICECONST 0
-STSLICECONST x33e3ad3c
+STSLICECONST x1e1639c3
 ;; secret
 ;; push identifier secret
-PUSH S2
+PUSH S3
 STREFR
-;; addr
-;; push identifier participant
-GETGLOB 11
-STSLICER
-;; time
-;; push identifier now
-NOW
-STUR 256
 ENDC
 PUSHINT 1
 SENDRAWMSG
+;; push identifier participant
+GETGLOB 11
+NEWC
+STSLICECONST x42_
+STSLICE
+PUSHSLICE x203e8000000000000000000000000004_
+STSLICER
+STSLICECONST 0
+STSLICECONST 0
+ENDC
+PUSHINT 160
+SENDRAWMSG
 DROP
 ; end function redeem
-; end modifier whenNotRedeemedAndNotRefunded
-; end modifier whenNotExpired
 DROP
-; end modifier onlyParticipant
+; end modifier only
+DROP
+; end modifier whenNotExpired
 CALL $c7_to_c4$
 TRUE
 SETGLOB 7
@@ -352,62 +239,23 @@ SETGLOB 7
 .globl	redeem_internal
 .type	redeem_internal, @function
 ;; param: secret
-; modifier onlyParticipant
-;; get member sender
-GETGLOB 9
-;; push identifier participant
-GETGLOB 11
-SDEQ
-THROWIFNOT 402
 ; modifier whenNotExpired
-;; get member createdAt
-DEPTH
-PUSHINT 5
-SUB
-PICK
-PUSHCONT {
-	PUSHINT 0
-}
-PUSHCONT {
-	DEPTH
-	PUSHINT 3
-	SUB
-	PICK
-	CTOS
-	LDU 4
-	LDMSGADDR
-	LDMSGADDR
-	LDGRAMS
-	LDDICT
-	LDGRAMS
-	LDGRAMS
-	LDU 64
-	PLDU 32
-	XCHG S8
-	BLKDROP 8
-}
-IFELSE
-;; push identifier expiredTime
+;; push identifier now
+NOW
+;; push identifier timeLock
 GETGLOB 12
 ;; <
 LESS
-THROWIFNOT 404
-; modifier whenNotRedeemedAndNotRefunded
-;; !
-;; push identifier redeemed
-GETGLOB 15
-NOT
-;; short-circuiting &&
-DUP
-PUSHCONT {
-	DROP
-	;; !
-	;; push identifier refunded
-	GETGLOB 16
-	NOT
-}
-IF
-THROWIFNOT 405
+THROWIFNOT 101
+; modifier only
+;; push identifier participant
+GETGLOB 11
+;; get member sender
+GETGLOB 9
+;; push identifier addr
+PUSH S1
+SDEQ
+THROWIFNOT 102
 ; function redeem
 ;; get member balance
 GETPARAM 7
@@ -416,9 +264,9 @@ INDEX 0
 GETGLOB 13
 ;; >=
 GEQ
-THROWIFNOT 412
+THROWIFNOT 110
 ;; push identifier secret
-DUP
+PUSH S1
 CALL $hashSecret_internal$
 ;; decl: computed_hash
 ;; push identifier computed_hash
@@ -427,67 +275,39 @@ DUP
 GETGLOB 14
 ;; ==
 EQUAL
-THROWIFNOT 413
-; expValue
-; end expValue
-TRUE
-; colValue
-SETGLOB 15
-; end colValue
-;; push identifier amount
-GETGLOB 13
-;; push identifier participant
-GETGLOB 11
-TRUE
-NEWC
-STSLICECONST x6_
-STI 1
-PUSHINT 3
-STZEROES
-STSLICE
-SWAP
-STGRAMS
-PUSHINT 105
-STZEROES
-STSLICECONST 0
-;; Remote call IAtomicSwapWallet.onRedeem
-STSLICECONST 0
-STSLICECONST x5d04df71
-;; secretHash
-;; push identifier secretHash
-GETGLOB 14
-STUR 256
-ENDC
-PUSHINT 64
-SENDRAWMSG
+THROWIFNOT 109
 ;; emit Redeemed
 NEWC
 PUSHSLICE xc0000000000000000000000002_
 STSLICER
 STSLICECONST 0
 STSLICECONST 0
-STSLICECONST x33e3ad3c
+STSLICECONST x1e1639c3
 ;; secret
 ;; push identifier secret
-PUSH S2
+PUSH S3
 STREFR
-;; addr
-;; push identifier participant
-GETGLOB 11
-STSLICER
-;; time
-;; push identifier now
-NOW
-STUR 256
 ENDC
 PUSHINT 1
 SENDRAWMSG
+;; push identifier participant
+GETGLOB 11
+NEWC
+STSLICECONST x42_
+STSLICE
+PUSHSLICE x203e8000000000000000000000000004_
+STSLICER
+STSLICECONST 0
+STSLICECONST 0
+ENDC
+PUSHINT 160
+SENDRAWMSG
 DROP
 ; end function redeem
-; end modifier whenNotRedeemedAndNotRefunded
-; end modifier whenNotExpired
 DROP
-; end modifier onlyParticipant
+; end modifier only
+DROP
+; end modifier whenNotExpired
 
 .globl	refund
 .public	refund
@@ -500,306 +320,80 @@ PUSHCONT {
 IF
 ; Decode input parameters
 ENDS
-; modifier onlyOwner
-;; get member sender
-GETGLOB 9
-;; push identifier owner
-GETGLOB 10
-SDEQ
-THROWIFNOT 401
 ; modifier whenExpired
-;; get member createdAt
-DEPTH
-PUSHINT 5
-SUB
-PICK
-PUSHCONT {
-	PUSHINT 0
-}
-PUSHCONT {
-	DEPTH
-	PUSHINT 3
-	SUB
-	PICK
-	CTOS
-	LDU 4
-	LDMSGADDR
-	LDMSGADDR
-	LDGRAMS
-	LDDICT
-	LDGRAMS
-	LDGRAMS
-	LDU 64
-	PLDU 32
-	XCHG S8
-	BLKDROP 8
-}
-IFELSE
-;; push identifier expiredTime
+;; push identifier now
+NOW
+;; push identifier timeLock
 GETGLOB 12
 ;; >=
 GEQ
-THROWIFNOT 403
-; modifier whenNotRedeemedAndNotRefunded
-;; !
-;; push identifier redeemed
-GETGLOB 15
-NOT
-;; short-circuiting &&
-DUP
-PUSHCONT {
-	DROP
-	;; !
-	;; push identifier refunded
-	GETGLOB 16
-	NOT
-}
-IF
-THROWIFNOT 405
+THROWIFNOT 102
+; modifier only
+;; push identifier initiator
+GETGLOB 10
+;; get member sender
+GETGLOB 9
+;; push identifier addr
+PUSH S1
+SDEQ
+THROWIFNOT 102
 ; function refund
-; expValue
-; end expValue
-TRUE
-; colValue
-SETGLOB 16
-; end colValue
-;; push identifier amount
-GETGLOB 13
-;; push identifier owner
+;; push identifier initiator
 GETGLOB 10
-TRUE
 NEWC
-STSLICECONST x6_
-STI 1
-PUSHINT 3
-STZEROES
+STSLICECONST x42_
 STSLICE
-SWAP
-STGRAMS
-PUSHINT 105
-STZEROES
-STSLICECONST 0
-;; Remote call IAtomicSwapWallet.onRefund
-STSLICECONST 0
-STSLICECONST x767d8cf5
-;; secretHash
-;; push identifier secretHash
-GETGLOB 14
-STUR 256
-ENDC
-PUSHINT 128
-SENDRAWMSG
-;; emit Refunded
-NEWC
-PUSHSLICE xc0000000000000000000000002_
+PUSHSLICE x203e8000000000000000000000000004_
 STSLICER
 STSLICECONST 0
 STSLICECONST 0
-STSLICECONST x5b684ed6
-;; addr
-;; push identifier owner
-GETGLOB 10
-STSLICER
-;; time
-;; push identifier now
-NOW
-STUR 256
 ENDC
-PUSHINT 1
+PUSHINT 160
 SENDRAWMSG
 ; end function refund
-; end modifier whenNotRedeemedAndNotRefunded
+DROP
+; end modifier only
 ; end modifier whenExpired
-; end modifier onlyOwner
 CALL $c7_to_c4$
 TRUE
 SETGLOB 7
 
 .globl	refund_internal
 .type	refund_internal, @function
-; modifier onlyOwner
-;; get member sender
-GETGLOB 9
-;; push identifier owner
-GETGLOB 10
-SDEQ
-THROWIFNOT 401
 ; modifier whenExpired
-;; get member createdAt
-DEPTH
-PUSHINT 5
-SUB
-PICK
-PUSHCONT {
-	PUSHINT 0
-}
-PUSHCONT {
-	DEPTH
-	PUSHINT 3
-	SUB
-	PICK
-	CTOS
-	LDU 4
-	LDMSGADDR
-	LDMSGADDR
-	LDGRAMS
-	LDDICT
-	LDGRAMS
-	LDGRAMS
-	LDU 64
-	PLDU 32
-	XCHG S8
-	BLKDROP 8
-}
-IFELSE
-;; push identifier expiredTime
+;; push identifier now
+NOW
+;; push identifier timeLock
 GETGLOB 12
 ;; >=
 GEQ
-THROWIFNOT 403
-; modifier whenNotRedeemedAndNotRefunded
-;; !
-;; push identifier redeemed
-GETGLOB 15
-NOT
-;; short-circuiting &&
-DUP
-PUSHCONT {
-	DROP
-	;; !
-	;; push identifier refunded
-	GETGLOB 16
-	NOT
-}
-IF
-THROWIFNOT 405
+THROWIFNOT 102
+; modifier only
+;; push identifier initiator
+GETGLOB 10
+;; get member sender
+GETGLOB 9
+;; push identifier addr
+PUSH S1
+SDEQ
+THROWIFNOT 102
 ; function refund
-; expValue
-; end expValue
-TRUE
-; colValue
-SETGLOB 16
-; end colValue
-;; push identifier amount
-GETGLOB 13
-;; push identifier owner
+;; push identifier initiator
 GETGLOB 10
-TRUE
 NEWC
-STSLICECONST x6_
-STI 1
-PUSHINT 3
-STZEROES
+STSLICECONST x42_
 STSLICE
-SWAP
-STGRAMS
-PUSHINT 105
-STZEROES
-STSLICECONST 0
-;; Remote call IAtomicSwapWallet.onRefund
-STSLICECONST 0
-STSLICECONST x767d8cf5
-;; secretHash
-;; push identifier secretHash
-GETGLOB 14
-STUR 256
-ENDC
-PUSHINT 128
-SENDRAWMSG
-;; emit Refunded
-NEWC
-PUSHSLICE xc0000000000000000000000002_
+PUSHSLICE x203e8000000000000000000000000004_
 STSLICER
 STSLICECONST 0
 STSLICECONST 0
-STSLICECONST x5b684ed6
-;; addr
-;; push identifier owner
-GETGLOB 10
-STSLICER
-;; time
-;; push identifier now
-NOW
-STUR 256
 ENDC
-PUSHINT 1
+PUSHINT 160
 SENDRAWMSG
 ; end function refund
-; end modifier whenNotRedeemedAndNotRefunded
+DROP
+; end modifier only
 ; end modifier whenExpired
-; end modifier onlyOwner
-
-.globl	destruct
-.public	destruct
-.type	destruct, @function
-GETGLOB 1
-ISNULL
-PUSHCONT {
-	CALL $c4_to_c7$
-}
-IF
-; Decode input parameters
-ENDS
-; modifier onlyOwner
-;; get member sender
-GETGLOB 9
-;; push identifier owner
-GETGLOB 10
-SDEQ
-THROWIFNOT 401
-; modifier whenRedeemedOrRefunded
-;; push identifier redeemed
-GETGLOB 15
-THROWIFNOT 406
-; function destruct
-;; push identifier owner
-GETGLOB 10
-NEWC
-STSLICECONST x42_
-STSLICE
-PUSHSLICE x203e8000000000000000000000000004_
-STSLICER
-STSLICECONST 0
-STSLICECONST 0
-ENDC
-PUSHINT 160
-SENDRAWMSG
-; end function destruct
-; end modifier whenRedeemedOrRefunded
-; end modifier onlyOwner
-CALL $c7_to_c4$
-TRUE
-SETGLOB 7
-
-.globl	destruct_internal
-.type	destruct_internal, @function
-; modifier onlyOwner
-;; get member sender
-GETGLOB 9
-;; push identifier owner
-GETGLOB 10
-SDEQ
-THROWIFNOT 401
-; modifier whenRedeemedOrRefunded
-;; push identifier redeemed
-GETGLOB 15
-THROWIFNOT 406
-; function destruct
-;; push identifier owner
-GETGLOB 10
-NEWC
-STSLICECONST x42_
-STSLICE
-PUSHSLICE x203e8000000000000000000000000004_
-STSLICER
-STSLICECONST 0
-STSLICECONST 0
-ENDC
-PUSHINT 160
-SENDRAWMSG
-; end function destruct
-; end modifier whenRedeemedOrRefunded
-; end modifier onlyOwner
 
 .globl	params
 .public	params
@@ -813,11 +407,11 @@ IF
 ; Decode input parameters
 ENDS
 ; function params
-;; ret param: _owner
+;; ret param: _initiator
 PUSHSLICE x8000000000000000000000000000000000000000000000000000000000000000001_
 ;; ret param: _participant
 PUSHSLICE x8000000000000000000000000000000000000000000000000000000000000000001_
-;; ret param: _expiredTime
+;; ret param: _timeLock
 PUSHINT 0
 ;; ret param: _secretHash
 PUSHINT 0
@@ -825,44 +419,40 @@ PUSHINT 0
 PUSHINT 0
 ;; ret param: _balance
 PUSHINT 0
-;; ret param: _redeemed
-PUSHINT 0
-;; ret param: _refunded
-PUSHINT 0
 ; expValue
 ; end expValue
-;; push identifier owner
+;; push identifier initiator
 GETGLOB 10
 ; colValue
-POP s8
+POP s6
 ; end colValue
 ; expValue
 ; end expValue
 ;; push identifier participant
 GETGLOB 11
 ; colValue
-POP s7
+POP s5
 ; end colValue
 ; expValue
 ; end expValue
-;; push identifier expiredTime
+;; push identifier timeLock
 GETGLOB 12
 ; colValue
-POP s6
+POP s4
 ; end colValue
 ; expValue
 ; end expValue
 ;; push identifier secretHash
 GETGLOB 14
 ; colValue
-POP s5
+POP s3
 ; end colValue
 ; expValue
 ; end expValue
 ;; push identifier amount
 GETGLOB 13
 ; colValue
-POP s4
+POP s2
 ; end colValue
 ;; get member balance
 GETPARAM 7
@@ -870,28 +460,14 @@ INDEX 0
 ; expValue
 ; end expValue
 ; colValue
-POP s3
-; end colValue
-; expValue
-; end expValue
-;; push identifier redeemed
-GETGLOB 15
-; colValue
-POP s2
-; end colValue
-; expValue
-; end expValue
-;; push identifier refunded
-GETGLOB 16
-; colValue
 NIP
 ; end colValue
 ;; returning named params
-;; emitting 8 value(s)
-PUSH S8
+;; emitting 6 value(s)
+PUSH S6
 EQINT -1
 PUSHCONT {
-	PUSH S10
+	PUSH S8
 	CTOS
 	LDU 2
 	LDMSGADDR
@@ -905,24 +481,20 @@ PUSHCONT {
 	STSLICECONST 0
 	STSLICECONST 1
 	NEWC
-	STSLICECONST xf19ae034
-	PUSH S9
-	STSLICER
-	PUSH S8
-	STSLICER
+	STSLICECONST xa49b8262
 	PUSH S7
-	STUR 32
+	STSLICER
 	PUSH S6
+	STSLICER
+	PUSH S5
+	STUR 32
+	PUSH S4
 	STUR 256
 	NEWC
-	PUSH S6
-	STUR 128
-	PUSH S5
-	STUR 256
 	PUSH S4
-	STIR 1
+	STUR 128
 	PUSH S3
-	STIR 1
+	STUR 256
 	STBREFR
 	STBREFR
 	ENDC
@@ -930,7 +502,7 @@ PUSHCONT {
 	SENDRAWMSG
 }
 IF
-BLKDROP 8
+BLKDROP 6
 ; end function params
 EQINT -1
 PUSHCONT {
@@ -943,11 +515,11 @@ SETGLOB 7
 .globl	params_internal
 .type	params_internal, @function
 ; function params
-;; ret param: _owner
+;; ret param: _initiator
 PUSHSLICE x8000000000000000000000000000000000000000000000000000000000000000001_
 ;; ret param: _participant
 PUSHSLICE x8000000000000000000000000000000000000000000000000000000000000000001_
-;; ret param: _expiredTime
+;; ret param: _timeLock
 PUSHINT 0
 ;; ret param: _secretHash
 PUSHINT 0
@@ -955,44 +527,40 @@ PUSHINT 0
 PUSHINT 0
 ;; ret param: _balance
 PUSHINT 0
-;; ret param: _redeemed
-PUSHINT 0
-;; ret param: _refunded
-PUSHINT 0
 ; expValue
 ; end expValue
-;; push identifier owner
+;; push identifier initiator
 GETGLOB 10
 ; colValue
-POP s8
+POP s6
 ; end colValue
 ; expValue
 ; end expValue
 ;; push identifier participant
 GETGLOB 11
 ; colValue
-POP s7
+POP s5
 ; end colValue
 ; expValue
 ; end expValue
-;; push identifier expiredTime
+;; push identifier timeLock
 GETGLOB 12
 ; colValue
-POP s6
+POP s4
 ; end colValue
 ; expValue
 ; end expValue
 ;; push identifier secretHash
 GETGLOB 14
 ; colValue
-POP s5
+POP s3
 ; end colValue
 ; expValue
 ; end expValue
 ;; push identifier amount
 GETGLOB 13
 ; colValue
-POP s4
+POP s2
 ; end colValue
 ;; get member balance
 GETPARAM 7
@@ -1000,24 +568,134 @@ INDEX 0
 ; expValue
 ; end expValue
 ; colValue
-POP s3
-; end colValue
-; expValue
-; end expValue
-;; push identifier redeemed
-GETGLOB 15
-; colValue
-POP s2
-; end colValue
-; expValue
-; end expValue
-;; push identifier refunded
-GETGLOB 16
-; colValue
 NIP
 ; end colValue
 ;; returning named params
 ; end function params
+
+.globl	canRedeen
+.public	canRedeen
+.type	canRedeen, @function
+GETGLOB 1
+ISNULL
+PUSHCONT {
+	CALL $c4_to_c7$
+}
+IF
+; Decode input parameters
+; Decode secret
+LDREF
+ENDS
+;; param: secret
+; function canRedeen
+;; return
+;; push identifier now
+NOW
+;; push identifier timeLock
+GETGLOB 12
+;; <
+LESS
+;; short-circuiting &&
+DUP
+PUSHCONT {
+	DROP
+	;; get member balance
+	GETPARAM 7
+	INDEX 0
+	;; push identifier amount
+	GETGLOB 13
+	;; >=
+	GEQ
+	;; short-circuiting &&
+	DUP
+	PUSHCONT {
+		DROP
+		;; push identifier secret
+		DUP
+		CALL $hashSecret_internal$
+		;; push identifier secretHash
+		GETGLOB 14
+		;; ==
+		EQUAL
+	}
+	IF
+}
+IF
+NIP
+;; emitting 1 value(s)
+PUSH S1
+EQINT -1
+PUSHCONT {
+	PUSH S3
+	CTOS
+	LDU 2
+	LDMSGADDR
+	DROP
+	NIP
+	NEWC
+	STSLICECONST xc
+	STSLICE
+	PUSHINT 96
+	STZEROES
+	STSLICECONST 0
+	STSLICECONST 0
+	STSLICECONST x88a7088f
+	PUSH S1
+	STIR 1
+	ENDC
+	PUSHINT 1
+	SENDRAWMSG
+}
+IF
+DROP
+; end function canRedeen
+EQINT -1
+PUSHCONT {
+	CALL $c7_to_c4$
+}
+IF
+TRUE
+SETGLOB 7
+
+.globl	canRedeen_internal
+.type	canRedeen_internal, @function
+;; param: secret
+; function canRedeen
+;; return
+;; push identifier now
+NOW
+;; push identifier timeLock
+GETGLOB 12
+;; <
+LESS
+;; short-circuiting &&
+DUP
+PUSHCONT {
+	DROP
+	;; get member balance
+	GETPARAM 7
+	INDEX 0
+	;; push identifier amount
+	GETGLOB 13
+	;; >=
+	GEQ
+	;; short-circuiting &&
+	DUP
+	PUSHCONT {
+		DROP
+		;; push identifier secret
+		DUP
+		CALL $hashSecret_internal$
+		;; push identifier secretHash
+		GETGLOB 14
+		;; ==
+		EQUAL
+	}
+	IF
+}
+IF
+NIP
+; end function canRedeen
 
 .globl	hashSecret
 .public	hashSecret
@@ -1103,15 +781,11 @@ STU 256
 GETGLOB 10
 GETGLOB 11
 GETGLOB 12
-GETGLOB 15
-GETGLOB 16
-REVERSE 7, 0
+REVERSE 5, 0
 STBREF
 STSLICE
 STSLICE
 STU 32
-STI 1
-STI 1
 ENDC
 POP C4
 
@@ -1129,11 +803,7 @@ SETGLOB 14
 SETGLOB 13
 LDMSGADDR
 LDMSGADDR
-LDU 32
-LDI 1
-PLDI 1
-SETGLOB 16
-SETGLOB 15
+PLDU 32
 SETGLOB 12
 SETGLOB 11
 SETGLOB 10
@@ -1160,11 +830,7 @@ PUSHCONT {
 	SETGLOB 13
 	LDMSGADDR
 	LDMSGADDR
-	LDU 32
-	LDI 1
-	PLDI 1
-	SETGLOB 16
-	SETGLOB 15
+	PLDU 32
 	SETGLOB 12
 	SETGLOB 11
 	SETGLOB 10
@@ -1176,13 +842,13 @@ PUSHCONT {
 }
 PUSHCONT {
 	PLDDICT   ; D
-	; init owner
+	; init initiator
 	PUSHSLICE x8000000000000000000000000000000000000000000000000000000000000000001_
 	SETGLOB 10
 	; init participant
 	PUSHSLICE x8000000000000000000000000000000000000000000000000000000000000000001_
 	SETGLOB 11
-	; init expiredTime
+	; init timeLock
 	PUSHINT 0
 	SETGLOB 12
 	; init amount
@@ -1201,12 +867,6 @@ PUSHCONT {
 	}
 	IFELSE
 	SETGLOB 14
-	; init redeemed
-	PUSHINT 0
-	SETGLOB 15
-	; init refunded
-	PUSHINT 0
-	SETGLOB 16
 	; set contract pubkey
 	PUSHINT 0
 	SWAP
@@ -1241,88 +901,7 @@ LDI 1     ; bounced tail
 LDMSGADDR   ; bounced src tail
 DROP
 SETGLOB 9
-PUSHCONT {
-	PUSH S1
-	LDSLICE 32
-	NIP
-	PUSHINT 1
-	CALL 1
-	CALL $c4_to_c7$
-	;; param: slice
-	; function onBounce
-	; expValue
-	DUP
-	; end expValue
-	LDU 32
-	; colValue
-	POP s2
-	; end colValue
-	;; decl: functionId
-	;; if
-	;; push identifier functionId
-	DUP
-	PUSHINT 1638861149
-	;; ==
-	EQUAL
-	PUSHCONT {
-	}
-	PUSHCONT {
-		;; if
-		;; push identifier functionId
-		DUP
-		PUSHINT 78760981
-		;; ==
-		EQUAL
-		PUSHCONT {
-		}
-		PUSHCONT {
-			;; if
-			;; push identifier functionId
-			DUP
-			PUSHINT 1560600433
-			;; ==
-			EQUAL
-			PUSHCONT {
-				; expValue
-				; end expValue
-				FALSE
-				; colValue
-				SETGLOB 15
-				; end colValue
-			}
-			PUSHCONT {
-				;; if
-				;; push identifier functionId
-				DUP
-				PUSHINT 1987939573
-				;; ==
-				EQUAL
-				PUSHCONT {
-					; expValue
-					; end expValue
-					FALSE
-					; colValue
-					SETGLOB 16
-					; end colValue
-				}
-				PUSHCONT {
-				}
-				IFELSE
-				;; end if
-			}
-			IFELSE
-			;; end if
-		}
-		IFELSE
-		;; end if
-	}
-	IFELSE
-	;; end if
-	DROP2
-	; end function onBounce
-	CALL $c7_to_c4$
-}
-IFJMP
+IFRET
 PUSH S1    ; body
 SEMPTY     ; isEmpty
 PUSHCONT {

@@ -1,12 +1,12 @@
 pragma solidity>=0.6.0;
 
-abstract contract IAtomicSwapWallet {
+interface IAtomicSwapWallet {
     
-    function onRedeem(uint256 secretHash) external virtual;
-
-    function onRefund(uint256 secretHash) external virtual;
-
-    function onInitiate(uint256 secretHash) external virtual;
-
-    function onParticipate(uint256 secretHash) external virtual;
+    function createSwap(
+        address initiator, 
+        address participant, 
+        uint128 amount,
+        uint32 timeLock,
+        TvmCell data
+    ) external returns (address);
 }

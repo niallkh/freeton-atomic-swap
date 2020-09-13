@@ -1,10 +1,8 @@
 pragma solidity>=0.6.0;
 
-abstract contract IAtomicSwap {
+interface IAtomicSwap {
 
-    function redeem(bytes secret) external virtual;
+    function redeem(bytes secret) external;
 
-    function refund() external virtual;
-
-    function destruct() external virtual;
+    function refund() external;
 }

@@ -2,123 +2,92 @@ pragma solidity>=0.6.0;
 pragma AbiHeader time;
 pragma AbiHeader expire;
 
-import "IAtomicSwapWallet.sol";
 import "IAtomicSwap.sol";
+import "IAccept.sol";
+import "AtomicSwapLib.sol";
 
 contract AtomicSwap is IAtomicSwap {
 
-    address owner;
+    bytes constant payload = "Atomic Swap";
+
+    address initiator;
     address participant;
-    uint32 expiredTime;
+    uint32 timeLock;
     uint128 amount;
 
     uint256 public secretHash;
 
-    bool redeemed;
-    bool refunded;
+    event Redeemed(bytes secret);
 
-    event Redeemed(bytes secret, address addr, uint256 time);
-    event Refunded(address addr, uint256 time);
-
-    modifier onlyOwner() {
-        require(msg.sender == owner, 401);_;
-    }
-
-    modifier onlyParticipant() {
-        require(msg.sender == participant, 402);_;
+    modifier only(address addr) {
+        require(msg.sender == addr, Errors.ATOMIC_SWAP_NOT_EXPIRED);_;
     }
 
     modifier whenExpired() {
-        require(msg.createdAt >= expiredTime, 403);_;
+        require(now >= timeLock, Errors.ATOMIC_SWAP_NOT_EXPIRED);_;
     }
 
     modifier whenNotExpired() {
-        require(msg.createdAt < expiredTime, 404);_;
+        require(now < timeLock, Errors.ATOMIC_SWAP_EXPIRED);_;
     }
 
-    modifier whenNotRedeemedAndNotRefunded() {
-        require(!redeemed && !refunded, 405);_;        
-    }
+    constructor(
+        address _initiator, 
+        address _participant, 
+        uint128 _amount, 
+        uint32 _timeLock
+    ) public {
+        require(!_initiator.isNone(), Errors.ADDRESS_IS_NONE);
+        require(!_participant.isNone(), Errors.ADDRESS_IS_NONE);
+        require(timeLock > now && timeLock < now + Time.MAX_TIME_LOCK, Errors.TIME_LOCK_INVALID);
 
-    modifier whenRedeemedOrRefunded() {
-        require(redeemed, 406);_;        
-    }
-
-    constructor(address _participant, uint128 _amount, uint32 timeLock) public {
-        require(!msg.sender.isNone(), 407);
-        require(!_participant.isNone(), 408);
-        require(msg.sender != _participant, 409);
-        require(timeLock > 0, 410);
-        require(msg.value >= amount, 411);
-        
-        owner = msg.sender;
+        initiator = _initiator;
         participant = _participant;
         amount = _amount;
-        expiredTime = msg.createdAt + timeLock;
-        redeemed = false;
-        refunded = false;
+        timeLock = _timeLock;
 
-        IAtomicSwapWallet(msg.sender).onInitiate { value: 100_000_000, bounce: true, flag: 1 } (secretHash);
-        IAtomicSwapWallet(_participant).onParticipate { value: 100_000_000, bounce: true, flag: 1 } (secretHash); // fixme check bounce
+        IAccept(participant).acceptTransfer { value: Fees.ATOMIC_SWAP_FWD_ACCEPT, bounce: true, flag: 1 } (payload);
     }
 
-    function redeem(bytes secret) external override onlyParticipant whenNotExpired whenNotRedeemedAndNotRefunded {
-        require(address(this).balance >= amount, 412);
+    function redeem(bytes secret) external override whenNotExpired only(participant) {
+        require(address(this).balance >= amount, Errors.BALANCE_INSUFFICIENT);
         uint256 computed_hash = hashSecret(secret);
-        require(computed_hash == secretHash, 413);
-        redeemed = true;
+        require(computed_hash == secretHash, Errors.SECRET_INVALID);
+    
+        emit Redeemed(secret);
 
-        IAtomicSwapWallet(participant).onRedeem { value: amount, bounce: true, flag: 64 } (secretHash);
-
-        emit Redeemed(secret, participant, now);
+        selfdestruct(participant);
     }
 
-    function refund() external override onlyOwner whenExpired whenNotRedeemedAndNotRefunded {
-        refunded = true;
-
-        IAtomicSwapWallet(owner).onRefund { value: amount, bounce: true, flag: 128 } (secretHash);
-        
-        emit Refunded(owner, now);
-    }
-
-    function destruct() external override onlyOwner whenRedeemedOrRefunded {
-        selfdestruct(owner);
+    function refund() external override whenExpired only(initiator) {
+        selfdestruct(initiator);
     }
 
     function params() public view returns (
-        address _owner,
+        address _initiator,
         address _participant,
-        uint32 _expiredTime,
+        uint32 _timeLock,
         uint256 _secretHash,
         uint128 _amount,
-        uint256 _balance,
-        bool _redeemed,
-        bool _refunded
+        uint256 _balance
     ) {
-        _owner = owner;
+        _initiator = initiator;
         _participant = participant;
-        _expiredTime = expiredTime;
+        _timeLock = timeLock;
         _secretHash = secretHash;
         _amount = amount;
         _balance = address(this).balance;
-        _redeemed = redeemed;
-        _refunded = refunded;
+    }
+
+    function canRedeen(bytes secret) public view returns (bool) {
+        return now < timeLock
+            && address(this).balance >= amount
+            && hashSecret(secret) == secretHash;
     }
 
     function hashSecret(bytes secret) public pure returns (uint256) {
         return uint256(sha256(secret));
     }
 
-    onBounce(TvmSlice slice) external {
-        uint32 functionId = slice.decode(uint32);
-        
-        if (functionId == tvm.functionId(IAtomicSwapWallet.onParticipate)) {
-        } else if (functionId == tvm.functionId(IAtomicSwapWallet.onInitiate)) {
-        } else if (functionId == tvm.functionId(IAtomicSwapWallet.onRedeem)) {
-            redeemed = false;
-        } else if (functionId == tvm.functionId(IAtomicSwapWallet.onRefund)) {
-            refunded = false;
-        } else {
-        }
-    }
+    receive() external {}
 }

@@ -9,9 +9,10 @@ const abi = {
 		{
 			"name": "constructor",
 			"inputs": [
+				{"name":"_initiator","type":"address"},
 				{"name":"_participant","type":"address"},
 				{"name":"_amount","type":"uint128"},
-				{"name":"timeLock","type":"uint32"}
+				{"name":"_timeLock","type":"uint32"}
 			],
 			"outputs": [
 			]
@@ -32,25 +33,25 @@ const abi = {
 			]
 		},
 		{
-			"name": "destruct",
-			"inputs": [
-			],
-			"outputs": [
-			]
-		},
-		{
 			"name": "params",
 			"inputs": [
 			],
 			"outputs": [
-				{"name":"_owner","type":"address"},
+				{"name":"_initiator","type":"address"},
 				{"name":"_participant","type":"address"},
-				{"name":"_expiredTime","type":"uint32"},
+				{"name":"_timeLock","type":"uint32"},
 				{"name":"_secretHash","type":"uint256"},
 				{"name":"_amount","type":"uint128"},
-				{"name":"_balance","type":"uint256"},
-				{"name":"_redeemed","type":"bool"},
-				{"name":"_refunded","type":"bool"}
+				{"name":"_balance","type":"uint256"}
+			]
+		},
+		{
+			"name": "canRedeen",
+			"inputs": [
+				{"name":"secret","type":"bytes"}
+			],
+			"outputs": [
+				{"name":"value0","type":"bool"}
 			]
 		},
 		{
@@ -70,18 +71,7 @@ const abi = {
 		{
 			"name": "Redeemed",
 			"inputs": [
-				{"name":"secret","type":"bytes"},
-				{"name":"addr","type":"address"},
-				{"name":"time","type":"uint256"}
-			],
-			"outputs": [
-			]
-		},
-		{
-			"name": "Refunded",
-			"inputs": [
-				{"name":"addr","type":"address"},
-				{"name":"time","type":"uint256"}
+				{"name":"secret","type":"bytes"}
 			],
 			"outputs": [
 			]
@@ -91,7 +81,7 @@ const abi = {
 
 const pkg = {
     abi,
-    imageBase64: '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',
+    imageBase64: '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',
 };
 
 class AtomicSwapContract {
@@ -110,9 +100,10 @@ class AtomicSwapContract {
 
     /**
      * @param {object} constructorParams
+     * @param {string} constructorParams._initiator (address)
      * @param {string} constructorParams._participant (address)
      * @param {uint128} constructorParams._amount
-     * @param {number} constructorParams.timeLock (uint32)
+     * @param {number} constructorParams._timeLock (uint32)
      * @param {object} initParams
      * @param {string} initParams.secretHash (uint256)
      */
@@ -189,28 +180,14 @@ class AtomicSwapContract {
     }
 
     /**
-     */
-    destruct() {
-        return this.run('destruct', {});
-    }
-
-    /**
-     */
-    destructLocal() {
-        return this.runLocal('destruct', {});
-    }
-
-    /**
      * @typedef AtomicSwapContract_params
      * @type {object}
-     * @property {string} _owner  (address)
+     * @property {string} _initiator  (address)
      * @property {string} _participant  (address)
-     * @property {number} _expiredTime  (uint32)
+     * @property {number} _timeLock  (uint32)
      * @property {string} _secretHash  (uint256)
      * @property {uint128} _amount 
      * @property {string} _balance  (uint256)
-     * @property {bool} _redeemed 
-     * @property {bool} _refunded 
      */
 
     /**
@@ -225,6 +202,30 @@ class AtomicSwapContract {
      */
     paramsLocal() {
         return this.runLocal('params', {});
+    }
+
+    /**
+     * @typedef AtomicSwapContract_canRedeen
+     * @type {object}
+     * @property {bool} value0 
+     */
+
+    /**
+     * @param {object} params
+     * @param {bytes} params.secret
+     * @return {Promise.<AtomicSwapContract_canRedeen>}
+     */
+    canRedeen(params) {
+        return this.run('canRedeen', params);
+    }
+
+    /**
+     * @param {object} params
+     * @param {bytes} params.secret
+     * @return {Promise.<AtomicSwapContract_canRedeen>}
+     */
+    canRedeenLocal(params) {
+        return this.runLocal('canRedeen', params);
     }
 
     /**

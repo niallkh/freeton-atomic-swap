@@ -5,9 +5,10 @@
 		{
 			"name": "constructor",
 			"inputs": [
+				{"name":"_initiator","type":"address"},
 				{"name":"_participant","type":"address"},
 				{"name":"_amount","type":"uint128"},
-				{"name":"timeLock","type":"uint32"}
+				{"name":"_timeLock","type":"uint32"}
 			],
 			"outputs": [
 			]
@@ -28,25 +29,25 @@
 			]
 		},
 		{
-			"name": "destruct",
-			"inputs": [
-			],
-			"outputs": [
-			]
-		},
-		{
 			"name": "params",
 			"inputs": [
 			],
 			"outputs": [
-				{"name":"_owner","type":"address"},
+				{"name":"_initiator","type":"address"},
 				{"name":"_participant","type":"address"},
-				{"name":"_expiredTime","type":"uint32"},
+				{"name":"_timeLock","type":"uint32"},
 				{"name":"_secretHash","type":"uint256"},
 				{"name":"_amount","type":"uint128"},
-				{"name":"_balance","type":"uint256"},
-				{"name":"_redeemed","type":"bool"},
-				{"name":"_refunded","type":"bool"}
+				{"name":"_balance","type":"uint256"}
+			]
+		},
+		{
+			"name": "canRedeen",
+			"inputs": [
+				{"name":"secret","type":"bytes"}
+			],
+			"outputs": [
+				{"name":"value0","type":"bool"}
 			]
 		},
 		{
@@ -66,18 +67,7 @@
 		{
 			"name": "Redeemed",
 			"inputs": [
-				{"name":"secret","type":"bytes"},
-				{"name":"addr","type":"address"},
-				{"name":"time","type":"uint256"}
-			],
-			"outputs": [
-			]
-		},
-		{
-			"name": "Refunded",
-			"inputs": [
-				{"name":"addr","type":"address"},
-				{"name":"time","type":"uint256"}
+				{"name":"secret","type":"bytes"}
 			],
 			"outputs": [
 			]

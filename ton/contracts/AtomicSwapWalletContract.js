@@ -15,80 +15,36 @@ const abi = {
 			]
 		},
 		{
+			"name": "sendTransaction",
+			"inputs": [
+				{"name":"dest","type":"address"},
+				{"name":"value","type":"uint128"},
+				{"name":"bounce","type":"bool"},
+				{"name":"flags","type":"uint8"},
+				{"name":"payload","type":"cell"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "acceptTransfer",
+			"inputs": [
+				{"name":"payload","type":"bytes"}
+			],
+			"outputs": [
+			]
+		},
+		{
 			"name": "createSwap",
 			"inputs": [
+				{"name":"initiator","type":"address"},
 				{"name":"participant","type":"address"},
 				{"name":"amount","type":"uint128"},
-				{"name":"time","type":"uint32"},
+				{"name":"timeLock","type":"uint32"},
 				{"name":"data","type":"cell"}
 			],
 			"outputs": [
 				{"name":"value0","type":"address"}
-			]
-		},
-		{
-			"name": "onInitiate",
-			"inputs": [
-				{"name":"secretHash","type":"uint256"}
-			],
-			"outputs": [
-			]
-		},
-		{
-			"name": "onParticipate",
-			"inputs": [
-				{"name":"secretHash","type":"uint256"}
-			],
-			"outputs": [
-			]
-		},
-		{
-			"name": "redeem",
-			"inputs": [
-				{"name":"secret","type":"bytes"}
-			],
-			"outputs": [
-			]
-		},
-		{
-			"name": "refund",
-			"inputs": [
-				{"name":"secretHash","type":"uint256"}
-			],
-			"outputs": [
-			]
-		},
-		{
-			"name": "destruct",
-			"inputs": [
-				{"name":"secretHash","type":"uint256"}
-			],
-			"outputs": [
-			]
-		},
-		{
-			"name": "onRedeem",
-			"inputs": [
-				{"name":"secretHash","type":"uint256"}
-			],
-			"outputs": [
-			]
-		},
-		{
-			"name": "onRefund",
-			"inputs": [
-				{"name":"secretHash","type":"uint256"}
-			],
-			"outputs": [
-			]
-		},
-		{
-			"name": "hashSecret",
-			"inputs": [
-				{"name":"secret","type":"bytes"}
-			],
-			"outputs": [
-				{"name":"value0","type":"uint256"}
 			]
 		}
 	],
@@ -96,45 +52,9 @@ const abi = {
 	],
 	"events": [
 		{
-			"name": "OnParticipate",
+			"name": "TransferAccepted",
 			"inputs": [
-				{"name":"secretHash","type":"uint256"},
-				{"name":"atomicSwap","type":"address"}
-			],
-			"outputs": [
-			]
-		},
-		{
-			"name": "OnInitiate",
-			"inputs": [
-				{"name":"secretHash","type":"uint256"},
-				{"name":"atomicSwap","type":"address"}
-			],
-			"outputs": [
-			]
-		},
-		{
-			"name": "OnRedeemed",
-			"inputs": [
-				{"name":"secretHash","type":"uint256"},
-				{"name":"amount","type":"uint256"}
-			],
-			"outputs": [
-			]
-		},
-		{
-			"name": "OnRefunded",
-			"inputs": [
-				{"name":"secretHash","type":"uint256"},
-				{"name":"amount","type":"uint256"}
-			],
-			"outputs": [
-			]
-		},
-		{
-			"name": "Error",
-			"inputs": [
-				{"name":"code","type":"uint32"}
+				{"name":"payload","type":"bytes"}
 			],
 			"outputs": [
 			]
@@ -144,7 +64,7 @@ const abi = {
 
 const pkg = {
     abi,
-    imageBase64: 'te6ccgECJwEAB0wAAgE0AwEBAcACAEPQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAib/APSkICLAAZL0oOGK7VNYMPShCgQBCvSkIPShBQIJngAAAAoJBgIBIAgHADs7UTQ0//TP9MA1PQE9AX4bPhr+Gp/+GH4Zvhj+GKAAPz4QsjL//hDzws/+EbPCwD4SvhL+ExeIMz0APQAye1UgAA9SDQ+QK1/zGAIBIA0LAer/f40IYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABPhpIe1E0CDXScIBjhrT/9M/0wDU9AT0Bfhs+Gv4an/4Yfhm+GP4Yo4i9AXIyfhqbfhrbfhscAGAQPQO8r3XC//4YnD4Y3D4Zn/4YeLTAAEMALqOEoECANcYIPkBWPhCIPhl+RDyqN7TPwGOHvhDIbkgnzAg+COBA+iogggbd0Cgud6S+GPggDTyNNjTHwH4I7zyudMfIcEDIoIQ/////byxkvI84AHwAfhHbpLyPN4CASAdDgIBIBYPAgEgExACASASEQDVt0YTbX4QW6S8Ave0//R+EUgbpIwcN74Qrry4GT4ACD4S4EBAPQOb6EwIG6z8uGXICBu8n9/yM+FgMoAc89Azo0EUBfXhAAAAAAAAAAAAAAAAAABzxbPgc+Bz5DmiEvSyXH7ADAw8Ap/+GeAA57efYz1+EFukvAL3tP/0SD4S4EBAPQOb6EwIG6z8uGaICBu8n/4SccF8uGb+EsiASEBgQEA9FswMfhryIvcAAAAAAAAAAAAAAAAIM8Wz4HPgc+QxrkkViLPC/9waKb7YJVopv5gMd/PC//JcfsAW/AKf/hngAgEgFRQA37bzT28+EFukvAL3tTR+EUgbpIwcN74Qrry4GT4ACDwCSD4TIEBAPQOb6EwIG6z8uGWICBu8n9/yM+FgMoAc89Azo0EUBfXhAAAAAAAAAAAAAAAAAABzxbPgc+Bz5GvNPbyI88UyXH7AFsw8Ap/+GeAAvbZrwld+EFukvAL3tP/0fhJyM+FCM6Abc9Az4HPgcmAQPsA+EwhAfhJWYEBAPQW+GzIi9wAAAAAAAAAAAAAAAAgzxbPgc+Bz5BkRznKIc8L//hJzxbJcfsAMPAKf/hngAgEgGBcA57mgm+4/CC3SXgF72n/6JB8JkCAgHoHN9CYEDdZ+XDMEBA3eT/8JOOC+XDM/CYRAJCAwICAei2YGPw2ZEXuAAAAAAAAAAAAAAAAEGeLZ8DnwOfIkIwe8RFnhf+4NFN9sEq0U38wGO/nhf/kuP2ALfgFP/wzwAgLEGhkA8a8Ddg/hBbpLwC97T/9H4RSBukjBw3vhCuvLgZPgAIPhLgQEA9A5voTAgbrPy4Zf4SyIBIQGBAQD0WzAx+GsgIG7yf3/Iz4WAygBzz0DOjQRQF9eEAAAAAAAAAAAAAAAAAAHPFs+Bz4HPkR8Yt2rJcfsAMDDwCn/4Z4BB64PY+obAf74QW6S8Ave+kDXDX+V1NHQ03/f1w0fldTR0NMf39TR+EUgbpIwcN74Qrry4GT4ACOLAscFs/LhkPgoJMcFs/LhkSHCAPLhkvgnbxAjghA7msoAoLV/vvLhlPhKIchyz0Bxz0EizxRxz0EhzxRxz0AgyQNfAyAg+QCBBADIywohHADezwv/ydAxJYIQO5rKAKC1fyHIz4WIzgH6AoBpz0DPg8+DIs8Uz4PIz5AlAnCOKM8WJ88LfybPCx/NyXH7ADExJcD/jiIn0NMB+kAwMcjPhyDOgGDPQM+Bz4HPkwAPY+ohzxbJcfsA3jBfBPAKf/hnAgEgHx4AgbpYmvFNTRIND5ArX/MSHA/44jI9DTAfpAMDHIz4cgzoBgz0DPgc+Bz5KWJrxSIc8L/8lx+wDeMMD/kvAK3n/4Z4AgEgISAA3bmRXSN/CC3RyT2omgQa6ThAMcNaf/pn+mAanoCegL8Nnw1/DU//DD8M3wx/DFHEXoC5GT8NTb8Nbb8NjgAwCB6B3le64X//DE4fDG4fDM//DDxb3wjeTm4/DNqaPwhYYB5cDJ8ABB8NRh4BT/8M8AIBSCMiAL20WOYK/CC3SXgF72n/6Pwk5GfChGdANuegZ8DnwOTAIH2AfCWQgPwkrMCAgHoLfDXkRe4AAAAAAAAAAAAAAAAQZ4tnwOfA58iIdneJEOeF//wk54tkuP2AGHgFP/wzwAEc2nAi0NYCMdIA+kAw+GkkAVqOgOAhxwCQ4CHXDR+S8jzhUxGQ4cEDIoIQ/////byxkvI84AHwAfhHbpLyPN4lAXoh1h8xcfAB8Asg0x8yIIIQOaIS9LqOJsiL3AAAAAAAAAAAAAAAACDPFs+Bz4HPkFD106KBAfTPCx/JcfsAJgC+jlkgghBrzT28uo4myIvcAAAAAAAAAAAAAAAAIM8Wz4HPgc+QUPXTooEB9c8LH8lx+wCOJsiL3AAAAAAAAAAAAAAAACDPFs+Bz4HPkFD106KBAfbPCx/JcfsA4uJb8Ao=',
+    imageBase64: 'te6ccgECFwEAA/oAAgE0AwEBAcACAEPQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAib/APSkICLAAZL0oOGK7VNYMPShCAQBCvSkIPShBQIJnwAAAAUHBgAtO1E0NP/0z/TANdM+Gp/+GH4Zvhj+GKAALT4QsjL//hDzws/+EbPCwD4SgHMye1UgAgEgDAkBAv8KAf5/jQhgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAE+Gkh7UTQINdJwgGOE9P/0z/TANdM+Gp/+GH4Zvhj+GKOHPQFyMn4anABgED0DvK91wv/+GJw+GNw+GZ/+GHi0wABjhKBAgDXGCD5AVj4QiD4ZfkQ8qje0z8BCwCKjh74QyG5IJ8wIPgjgQPoqIIIG3dAoLnekvhj4IA08jTY0x8B+CO88rnTHyHBAyKCEP////28sZLyPOAB8AH4R26S8jzeAgEgFA0CASARDgHlutCQYM+EFukvAF3vpA+kGV1NHQ+kDf1w1/ldTR0NN/39cNH5XU0dDTH9/U0fhFIG6SMHDe+EK6IJgw+EmLAscFs9/y4GskiwLHBbPy4GcjiwLHBbPy4Gch+CO8IJswIfgjgggJOoCgud7y4Gj4SYsCxwWA8B+I4R+CdvECOCCJiWgKC1f77y4G6OGXBopvtglWim/mAx3yOCCJiWgKC1f77y4G7i+EohyHLPQHHPQSLPFHHPQSHPFHHPQCDJA18DICD5AIEEAMjLCiHPC//J0DElghA7msoAoLV/IcjPhYjOAfoCgGnPQM+Dz4MizxTPg8gQAJbPkW0C2OYpzxYozxYnzwt/Js8LH83JcfsAMQZfBiHA/44iI9DTAfpAMDHIz4cgzoBgz0DPgc+Bz5O0JBgyIc8WyXH7AN4w8AR/+GcCASATEgCVuUyBnp8ILdJeALvamjkRe4AAAAAAAAAAAAAAAAQZ4tnwOfA58j65TmREOeKZLj9gHwk5GfCxGdANuegZ8DnwOTAIH2AGHgCP/wzwAMe5ncyNnwgt0l4Au99IGuGv8rqaOhpv+/rhgBK6mjoaQBv64aDyupo6GmD7+po/CKQN0kYOG98IV15cDZ8ABGSkmRnwsBlADnnoGcA/QFANOegZ8DnwZDnimSRfYAvgvgCP/wzwAgFIFhUAtbmRXSN/CC3Rx52omgQa6ThAMcJ6f/pn+mAa6Z8NT/8MPwzfDH8MUcOegLkZPw1OADAIHoHeV7rhf/8MTh8Mbh8Mz/8MPFvfCN5Obj8M2po/AAQfDUYeAI//DPAActxwItDWAjHSAPpAMPhp3CHHAJDgIdcNH5LyPOFTEZDhwQMighD////9vLGS8jzgAfAB+EdukvI83g==',
 };
 
 class AtomicSwapWalletContract {
@@ -210,6 +130,46 @@ class AtomicSwapWalletContract {
     }
 
     /**
+     * @param {object} params
+     * @param {string} params.dest (address)
+     * @param {uint128} params.value
+     * @param {bool} params.bounce
+     * @param {number} params.flags (uint8)
+     * @param {cell} params.payload
+     */
+    sendTransaction(params) {
+        return this.run('sendTransaction', params);
+    }
+
+    /**
+     * @param {object} params
+     * @param {string} params.dest (address)
+     * @param {uint128} params.value
+     * @param {bool} params.bounce
+     * @param {number} params.flags (uint8)
+     * @param {cell} params.payload
+     */
+    sendTransactionLocal(params) {
+        return this.runLocal('sendTransaction', params);
+    }
+
+    /**
+     * @param {object} params
+     * @param {bytes} params.payload
+     */
+    acceptTransfer(params) {
+        return this.run('acceptTransfer', params);
+    }
+
+    /**
+     * @param {object} params
+     * @param {bytes} params.payload
+     */
+    acceptTransferLocal(params) {
+        return this.runLocal('acceptTransfer', params);
+    }
+
+    /**
      * @typedef AtomicSwapWalletContract_createSwap
      * @type {object}
      * @property {string} value0  (address)
@@ -217,9 +177,10 @@ class AtomicSwapWalletContract {
 
     /**
      * @param {object} params
+     * @param {string} params.initiator (address)
      * @param {string} params.participant (address)
      * @param {uint128} params.amount
-     * @param {number} params.time (uint32)
+     * @param {number} params.timeLock (uint32)
      * @param {cell} params.data
      * @return {Promise.<AtomicSwapWalletContract_createSwap>}
      */
@@ -229,150 +190,15 @@ class AtomicSwapWalletContract {
 
     /**
      * @param {object} params
+     * @param {string} params.initiator (address)
      * @param {string} params.participant (address)
      * @param {uint128} params.amount
-     * @param {number} params.time (uint32)
+     * @param {number} params.timeLock (uint32)
      * @param {cell} params.data
      * @return {Promise.<AtomicSwapWalletContract_createSwap>}
      */
     createSwapLocal(params) {
         return this.runLocal('createSwap', params);
-    }
-
-    /**
-     * @param {object} params
-     * @param {string} params.secretHash (uint256)
-     */
-    onInitiate(params) {
-        return this.run('onInitiate', params);
-    }
-
-    /**
-     * @param {object} params
-     * @param {string} params.secretHash (uint256)
-     */
-    onInitiateLocal(params) {
-        return this.runLocal('onInitiate', params);
-    }
-
-    /**
-     * @param {object} params
-     * @param {string} params.secretHash (uint256)
-     */
-    onParticipate(params) {
-        return this.run('onParticipate', params);
-    }
-
-    /**
-     * @param {object} params
-     * @param {string} params.secretHash (uint256)
-     */
-    onParticipateLocal(params) {
-        return this.runLocal('onParticipate', params);
-    }
-
-    /**
-     * @param {object} params
-     * @param {bytes} params.secret
-     */
-    redeem(params) {
-        return this.run('redeem', params);
-    }
-
-    /**
-     * @param {object} params
-     * @param {bytes} params.secret
-     */
-    redeemLocal(params) {
-        return this.runLocal('redeem', params);
-    }
-
-    /**
-     * @param {object} params
-     * @param {string} params.secretHash (uint256)
-     */
-    refund(params) {
-        return this.run('refund', params);
-    }
-
-    /**
-     * @param {object} params
-     * @param {string} params.secretHash (uint256)
-     */
-    refundLocal(params) {
-        return this.runLocal('refund', params);
-    }
-
-    /**
-     * @param {object} params
-     * @param {string} params.secretHash (uint256)
-     */
-    destruct(params) {
-        return this.run('destruct', params);
-    }
-
-    /**
-     * @param {object} params
-     * @param {string} params.secretHash (uint256)
-     */
-    destructLocal(params) {
-        return this.runLocal('destruct', params);
-    }
-
-    /**
-     * @param {object} params
-     * @param {string} params.secretHash (uint256)
-     */
-    onRedeem(params) {
-        return this.run('onRedeem', params);
-    }
-
-    /**
-     * @param {object} params
-     * @param {string} params.secretHash (uint256)
-     */
-    onRedeemLocal(params) {
-        return this.runLocal('onRedeem', params);
-    }
-
-    /**
-     * @param {object} params
-     * @param {string} params.secretHash (uint256)
-     */
-    onRefund(params) {
-        return this.run('onRefund', params);
-    }
-
-    /**
-     * @param {object} params
-     * @param {string} params.secretHash (uint256)
-     */
-    onRefundLocal(params) {
-        return this.runLocal('onRefund', params);
-    }
-
-    /**
-     * @typedef AtomicSwapWalletContract_hashSecret
-     * @type {object}
-     * @property {string} value0  (uint256)
-     */
-
-    /**
-     * @param {object} params
-     * @param {bytes} params.secret
-     * @return {Promise.<AtomicSwapWalletContract_hashSecret>}
-     */
-    hashSecret(params) {
-        return this.run('hashSecret', params);
-    }
-
-    /**
-     * @param {object} params
-     * @param {bytes} params.secret
-     * @return {Promise.<AtomicSwapWalletContract_hashSecret>}
-     */
-    hashSecretLocal(params) {
-        return this.runLocal('hashSecret', params);
     }
 
 }
