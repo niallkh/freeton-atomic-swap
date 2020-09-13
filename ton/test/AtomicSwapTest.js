@@ -137,7 +137,7 @@ describe('Atomic Swap Wallet Test', function () {
             'initiator': initiatorContract.address, 
             'participant': participantContract.address, 
             'amount': 10_000_000_000,
-            'timeLock': parseInt(Date.now() / 1000) + 60 * 60,
+            'timeLock': parseInt(Date.now() / 1000) + 60,
             'data': data.dataBase64
         })
         const atomicSwapAddress = result['value0']

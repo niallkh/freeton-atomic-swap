@@ -11,6 +11,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@truffle/hdwallet-provider": "^1.0.44",
     "truffle": "^5.1.43"
+  },
+  "devDependencies": {  
+    "eslint": "^7.8.1",
+    "chai": "^4.2.0"
   }
 }
