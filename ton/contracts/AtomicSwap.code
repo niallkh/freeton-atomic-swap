@@ -52,24 +52,8 @@ ENDS
 ;; param: _amount
 ;; param: _timeLock
 ; constructor AtomicSwap
-;; !
-;; address.isNone()
-;; push identifier _initiator
-PUSH S3
-PUSHSLICE x2_
-SDEQ
-NOT
-THROWIFNOT 103
-;; !
-;; address.isNone()
-;; push identifier _participant
-PUSH S2
-PUSHSLICE x2_
-SDEQ
-NOT
-THROWIFNOT 103
-;; push identifier timeLock
-GETGLOB 12
+;; push identifier _timeLock
+DUP
 ;; push identifier now
 NOW
 ;; >
@@ -78,8 +62,8 @@ GREATER
 DUP
 PUSHCONT {
 	DROP
-	;; push identifier timeLock
-	GETGLOB 12
+	;; push identifier _timeLock
+	DUP
 	;; push identifier now
 	NOW
 	PUSHINT 604800

@@ -37,9 +37,7 @@ contract AtomicSwap is IAtomicSwap {
         uint128 _amount, 
         uint32 _timeLock
     ) public {
-        require(!_initiator.isNone(), Errors.ADDRESS_IS_NONE);
-        require(!_participant.isNone(), Errors.ADDRESS_IS_NONE);
-        require(timeLock > now && timeLock < now + Time.MAX_TIME_LOCK, Errors.TIME_LOCK_INVALID);
+        require(_timeLock > now && _timeLock < now + Time.MAX_TIME_LOCK, Errors.TIME_LOCK_INVALID);
 
         initiator = _initiator;
         participant = _participant;

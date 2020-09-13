@@ -66,7 +66,7 @@ PUSHCONT {
 	LDI 1
 }
 IFNOT
-; Decode flags
+; Decode flag
 LDUQ 8
 PUSHCONT {
 	;; load next cell
@@ -83,7 +83,7 @@ ENDS
 ;; param: dest
 ;; param: value
 ;; param: bounce
-;; param: flags
+;; param: flag
 ;; param: payload
 ; function sendTransaction
 GETGLOB 5
@@ -122,7 +122,7 @@ STSLICECONST 1
 PUSH S1
 STREFR
 ENDC
-;; push identifier flags
+;; push identifier flag
 PUSH S2
 SENDRAWMSG
 BLKDROP 5
@@ -136,7 +136,7 @@ SETGLOB 7
 ;; param: dest
 ;; param: value
 ;; param: bounce
-;; param: flags
+;; param: flag
 ;; param: payload
 ; function sendTransaction
 GETGLOB 5
@@ -175,7 +175,7 @@ STSLICECONST 1
 PUSH S1
 STREFR
 ENDC
-;; push identifier flags
+;; push identifier flag
 PUSH S2
 SENDRAWMSG
 BLKDROP 5
@@ -315,6 +315,7 @@ ENDS
 ;; param: timeLock
 ;; param: data
 ; function createSwap
+;; if
 GETGLOB 5
 DUP
 ISNULL
@@ -326,36 +327,49 @@ IF
 GETGLOB 2
 ;; ==
 EQUAL
-;; short-circuiting ||
-DUP
 PUSHCONT {
-	DROP
-	;; !
-	;; address.isNone()
+	ACCEPT
+	;; get member balance
+	GETPARAM 7
+	INDEX 0
+	;; push identifier amount
+	PUSH S3
+	PUSHINT 10000000
+	;; +
+	ADD
+	UFITS 128
+	;; >=
+	GEQ
+	THROWIFNOT 110
+}
+PUSHCONT {
+	;; if
 	;; get member sender
 	GETGLOB 9
-	PUSHSLICE x2_
+	PUSHSLICE x8000000000000000000000000000000000000000000000000000000000000000001_
 	SDEQ
 	NOT
+	PUSHCONT {
+		;; get member value
+		CALL $message_balance_macro$
+		;; push identifier amount
+		PUSH S3
+		PUSHINT 10000000
+		;; +
+		ADD
+		UFITS 128
+		;; >=
+		GEQ
+		THROWIFNOT 110
+	}
+	PUSHCONT {
+		THROW 107
+	}
+	IFELSE
+	;; end if
 }
-IFNOT
-THROWIFNOT 107
-;; !
-;; address.isNone()
-;; push identifier initiator
-PUSH S4
-PUSHSLICE x2_
-SDEQ
-NOT
-THROWIFNOT 103
-;; !
-;; address.isNone()
-;; push identifier participant
-PUSH S3
-PUSHSLICE x2_
-SDEQ
-NOT
-THROWIFNOT 103
+IFELSE
+;; end if
 ;; push identifier timeLock
 PUSH S1
 ;; push identifier now
@@ -378,41 +392,6 @@ PUSHCONT {
 }
 IF
 THROWIFNOT 104
-;; if
-;; address.isNone()
-;; get member sender
-GETGLOB 9
-PUSHSLICE x2_
-SDEQ
-PUSHCONT {
-	;; get member balance
-	GETPARAM 7
-	INDEX 0
-	;; push identifier amount
-	PUSH S3
-	PUSHINT 10000000
-	;; +
-	ADD
-	UFITS 128
-	;; >=
-	GEQ
-	THROWIFNOT 110
-}
-PUSHCONT {
-	;; get member value
-	CALL $message_balance_macro$
-	;; push identifier amount
-	PUSH S3
-	PUSHINT 10000000
-	;; +
-	ADD
-	UFITS 128
-	;; >=
-	GEQ
-	THROWIFNOT 110
-}
-IFELSE
-;; end if
 ;; push identifier codeAtomicSwap
 GETGLOB 10
 ;; push identifier data
@@ -426,7 +405,7 @@ HASHCU
 CALL $make_std_address_with_zero_wid_macro$
 ;; push identifier amount
 PUSH S5
-PUSHINT 1000000000
+PUSHINT 10000000
 ;; +
 ADD
 UFITS 128
@@ -509,6 +488,7 @@ SETGLOB 7
 ;; param: timeLock
 ;; param: data
 ; function createSwap
+;; if
 GETGLOB 5
 DUP
 ISNULL
@@ -520,36 +500,49 @@ IF
 GETGLOB 2
 ;; ==
 EQUAL
-;; short-circuiting ||
-DUP
 PUSHCONT {
-	DROP
-	;; !
-	;; address.isNone()
+	ACCEPT
+	;; get member balance
+	GETPARAM 7
+	INDEX 0
+	;; push identifier amount
+	PUSH S3
+	PUSHINT 10000000
+	;; +
+	ADD
+	UFITS 128
+	;; >=
+	GEQ
+	THROWIFNOT 110
+}
+PUSHCONT {
+	;; if
 	;; get member sender
 	GETGLOB 9
-	PUSHSLICE x2_
+	PUSHSLICE x8000000000000000000000000000000000000000000000000000000000000000001_
 	SDEQ
 	NOT
+	PUSHCONT {
+		;; get member value
+		CALL $message_balance_macro$
+		;; push identifier amount
+		PUSH S3
+		PUSHINT 10000000
+		;; +
+		ADD
+		UFITS 128
+		;; >=
+		GEQ
+		THROWIFNOT 110
+	}
+	PUSHCONT {
+		THROW 107
+	}
+	IFELSE
+	;; end if
 }
-IFNOT
-THROWIFNOT 107
-;; !
-;; address.isNone()
-;; push identifier initiator
-PUSH S4
-PUSHSLICE x2_
-SDEQ
-NOT
-THROWIFNOT 103
-;; !
-;; address.isNone()
-;; push identifier participant
-PUSH S3
-PUSHSLICE x2_
-SDEQ
-NOT
-THROWIFNOT 103
+IFELSE
+;; end if
 ;; push identifier timeLock
 PUSH S1
 ;; push identifier now
@@ -572,41 +565,6 @@ PUSHCONT {
 }
 IF
 THROWIFNOT 104
-;; if
-;; address.isNone()
-;; get member sender
-GETGLOB 9
-PUSHSLICE x2_
-SDEQ
-PUSHCONT {
-	;; get member balance
-	GETPARAM 7
-	INDEX 0
-	;; push identifier amount
-	PUSH S3
-	PUSHINT 10000000
-	;; +
-	ADD
-	UFITS 128
-	;; >=
-	GEQ
-	THROWIFNOT 110
-}
-PUSHCONT {
-	;; get member value
-	CALL $message_balance_macro$
-	;; push identifier amount
-	PUSH S3
-	PUSHINT 10000000
-	;; +
-	ADD
-	UFITS 128
-	;; >=
-	GEQ
-	THROWIFNOT 110
-}
-IFELSE
-;; end if
 ;; push identifier codeAtomicSwap
 GETGLOB 10
 ;; push identifier data
@@ -620,7 +578,7 @@ HASHCU
 CALL $make_std_address_with_zero_wid_macro$
 ;; push identifier amount
 PUSH S5
-PUSHINT 1000000000
+PUSHINT 10000000
 ;; +
 ADD
 UFITS 128
@@ -665,6 +623,72 @@ NIP
 XCHG s6
 BLKDROP 6
 ; end function createSwap
+
+.globl	hashSecret
+.public	hashSecret
+.type	hashSecret, @function
+; Decode input parameters
+; Decode secret
+LDREF
+ENDS
+;; param: secret
+; function hashSecret
+;; return
+;; push identifier secret
+DUP
+CTOS
+SHA256U
+;; uint256
+UFITS 256
+NIP
+;; emitting 1 value(s)
+PUSH S1
+EQINT -1
+PUSHCONT {
+	PUSH S3
+	CTOS
+	LDU 2
+	LDMSGADDR
+	DROP
+	NIP
+	NEWC
+	STSLICECONST xc
+	STSLICE
+	PUSHINT 96
+	STZEROES
+	STSLICECONST 0
+	STSLICECONST 0
+	STSLICECONST xa589af14
+	PUSH S1
+	STUR 256
+	ENDC
+	PUSHINT 1
+	SENDRAWMSG
+}
+IF
+DROP
+; end function hashSecret
+EQINT -1
+PUSHCONT {
+	CALL $c7_to_c4$
+}
+IF
+TRUE
+SETGLOB 7
+
+.globl	hashSecret_internal
+.type	hashSecret_internal, @function
+;; param: secret
+; function hashSecret
+;; return
+;; push identifier secret
+DUP
+CTOS
+SHA256U
+;; uint256
+UFITS 256
+NIP
+; end function hashSecret
 
 .globl	c7_to_c4
 .type	c7_to_c4, @function

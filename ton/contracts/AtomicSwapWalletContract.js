@@ -20,7 +20,7 @@ const abi = {
 				{"name":"dest","type":"address"},
 				{"name":"value","type":"uint128"},
 				{"name":"bounce","type":"bool"},
-				{"name":"flags","type":"uint8"},
+				{"name":"flag","type":"uint8"},
 				{"name":"payload","type":"cell"}
 			],
 			"outputs": [
@@ -46,6 +46,15 @@ const abi = {
 			"outputs": [
 				{"name":"value0","type":"address"}
 			]
+		},
+		{
+			"name": "hashSecret",
+			"inputs": [
+				{"name":"secret","type":"bytes"}
+			],
+			"outputs": [
+				{"name":"value0","type":"uint256"}
+			]
 		}
 	],
 	"data": [
@@ -64,7 +73,7 @@ const abi = {
 
 const pkg = {
     abi,
-    imageBase64: 'te6ccgECFwEAA/oAAgE0AwEBAcACAEPQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAib/APSkICLAAZL0oOGK7VNYMPShCAQBCvSkIPShBQIJnwAAAAUHBgAtO1E0NP/0z/TANdM+Gp/+GH4Zvhj+GKAALT4QsjL//hDzws/+EbPCwD4SgHMye1UgAgEgDAkBAv8KAf5/jQhgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAE+Gkh7UTQINdJwgGOE9P/0z/TANdM+Gp/+GH4Zvhj+GKOHPQFyMn4anABgED0DvK91wv/+GJw+GNw+GZ/+GHi0wABjhKBAgDXGCD5AVj4QiD4ZfkQ8qje0z8BCwCKjh74QyG5IJ8wIPgjgQPoqIIIG3dAoLnekvhj4IA08jTY0x8B+CO88rnTHyHBAyKCEP////28sZLyPOAB8AH4R26S8jzeAgEgFA0CASARDgHlutCQYM+EFukvAF3vpA+kGV1NHQ+kDf1w1/ldTR0NN/39cNH5XU0dDTH9/U0fhFIG6SMHDe+EK6IJgw+EmLAscFs9/y4GskiwLHBbPy4GcjiwLHBbPy4Gch+CO8IJswIfgjgggJOoCgud7y4Gj4SYsCxwWA8B+I4R+CdvECOCCJiWgKC1f77y4G6OGXBopvtglWim/mAx3yOCCJiWgKC1f77y4G7i+EohyHLPQHHPQSLPFHHPQSHPFHHPQCDJA18DICD5AIEEAMjLCiHPC//J0DElghA7msoAoLV/IcjPhYjOAfoCgGnPQM+Dz4MizxTPg8gQAJbPkW0C2OYpzxYozxYnzwt/Js8LH83JcfsAMQZfBiHA/44iI9DTAfpAMDHIz4cgzoBgz0DPgc+Bz5O0JBgyIc8WyXH7AN4w8AR/+GcCASATEgCVuUyBnp8ILdJeALvamjkRe4AAAAAAAAAAAAAAAAQZ4tnwOfA58j65TmREOeKZLj9gHwk5GfCxGdANuegZ8DnwOTAIH2AGHgCP/wzwAMe5ncyNnwgt0l4Au99IGuGv8rqaOhpv+/rhgBK6mjoaQBv64aDyupo6GmD7+po/CKQN0kYOG98IV15cDZ8ABGSkmRnwsBlADnnoGcA/QFANOegZ8DnwZDnimSRfYAvgvgCP/wzwAgFIFhUAtbmRXSN/CC3Rx52omgQa6ThAMcJ6f/pn+mAa6Z8NT/8MPwzfDH8MUcOegLkZPw1OADAIHoHeV7rhf/8MTh8Mbh8Mz/8MPFvfCN5Obj8M2po/AAQfDUYeAI//DPAActxwItDWAjHSAPpAMPhp3CHHAJDgIdcNH5LyPOFTEZDhwQMighD////9vLGS8jzgAfAB+EdukvI83g==',
+    imageBase64: 'te6ccgECGQEABE0AAgE0AwEBAcACAEPQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAib/APSkICLAAZL0oOGK7VNYMPShCAQBCvSkIPShBQIJngAAAAYHBgAtTtRNDT/9M/0wDXTPhqf/hh+Gb4Y/higALV+ELIy//4Q88LP/hGzwsA+EoBzMntVIAgEgDAkBAv8KAf5/jQhgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAE+Gkh7UTQINdJwgGOE9P/0z/TANdM+Gp/+GH4Zvhj+GKOHPQFyMn4anABgED0DvK91wv/+GJw+GNw+GZ/+GHi0wABjhKBAgDXGCD5AVj4QiD4ZfkQ8qje0z8BCwCKjh74QyG5IJ8wIPgjgQPoqIIIG3dAoLnekvhj4IA08jTY0x8B+CO88rnTHyHBAyKCEP////28sZLyPOAB8AH4R26S8jzeAgEgFA0CASARDgGZutCQYM+EFukvAG3vpA+kGV1NHQ+kDf1w1/ldTR0NN/39cNH5XU0dDTH9/U0fhFIG6SMHDe+EK6jhP4APgnbxAjggiYloCgtX++8uBugPAfyOSfhJjQhgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAExwWzjhlwaKb7YJVopv5gMd8jggiYloCgtX++8uBuk/LAa+LiIfgjvCCbMCH4I4IICTqAoLne8uBo+EohyHLPQHHPQSLPFHHPQSHPFHHPQCDJA18DICAQAPT5AIEEAMjLCiHPC//J0DElggiYloCgtX8hyM+FiM4B+gKAac9Az4PPgyLPFM+DyM+RbQLY5inPFijPFifPC38mzwsfzclx+wAxBl8GIcD/jiIj0NMB+kAwMcjPhyDOgGDPQM+Bz4HPk7QkGDIhzxbJcfsA3jDwBX/4ZwIBIBMSAJW5TIGenwgt0l4A29qaORF7gAAAAAAAAAAAAAAABBni2fA58DnyPrlOZEQ54pkuP2AfCTkZ8LEZ0A256BnwOfA5MAgfYAYeAK//DPAAx7mdzI2fCC3SXgDb30ga4a/yupo6Gm/7+uGAErqaOhpAG/rhoPK6mjoaYPv6mj8IpA3SRg4b3whXXlwNnwAEZKSZGfCwGUAOeegZwD9AUA056BnwOfBkOeKZJF9gC+C+AK//DPACASAWFQCBulia8U1NEg0PkCtf8xIcD/jiMj0NMB+kAwMcjPhyDOgGDPQM+Bz4HPkpYmvFIhzwv/yXH7AN4wwP+S8AXef/hngCASAYFwC1uZFdI38ILdHHnaiaBBrpOEAxwnp/+mf6YBrpnw1P/ww/DN8MfwxRw56AuRk/DU4AMAgegd5XuuF//wxOHwxuHwzP/ww8W98I3k5uPwzamj8ABB8NRh4Ar/8M8ABy3HAi0NYCMdIA+kAw+GncIccAkOAh1w0fkvI84VMRkOHBAyKCEP////28sZLyPOAB8AH4R26S8jze',
 };
 
 class AtomicSwapWalletContract {
@@ -134,7 +143,7 @@ class AtomicSwapWalletContract {
      * @param {string} params.dest (address)
      * @param {uint128} params.value
      * @param {bool} params.bounce
-     * @param {number} params.flags (uint8)
+     * @param {number} params.flag (uint8)
      * @param {cell} params.payload
      */
     sendTransaction(params) {
@@ -146,7 +155,7 @@ class AtomicSwapWalletContract {
      * @param {string} params.dest (address)
      * @param {uint128} params.value
      * @param {bool} params.bounce
-     * @param {number} params.flags (uint8)
+     * @param {number} params.flag (uint8)
      * @param {cell} params.payload
      */
     sendTransactionLocal(params) {
@@ -199,6 +208,30 @@ class AtomicSwapWalletContract {
      */
     createSwapLocal(params) {
         return this.runLocal('createSwap', params);
+    }
+
+    /**
+     * @typedef AtomicSwapWalletContract_hashSecret
+     * @type {object}
+     * @property {string} value0  (uint256)
+     */
+
+    /**
+     * @param {object} params
+     * @param {bytes} params.secret
+     * @return {Promise.<AtomicSwapWalletContract_hashSecret>}
+     */
+    hashSecret(params) {
+        return this.run('hashSecret', params);
+    }
+
+    /**
+     * @param {object} params
+     * @param {bytes} params.secret
+     * @return {Promise.<AtomicSwapWalletContract_hashSecret>}
+     */
+    hashSecretLocal(params) {
+        return this.runLocal('hashSecret', params);
     }
 
 }

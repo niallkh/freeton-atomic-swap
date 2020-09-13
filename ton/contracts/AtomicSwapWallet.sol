@@ -24,12 +24,12 @@ contract AtomicSwapWallet is IAccept, IAtomicSwapWallet {
         address dest,
         uint128 value,
         bool bounce,
-        uint8 flags,
+        uint8 flag,
         TvmCell payload
     ) external {
         require(msg.pubkey() == tvm.pubkey(), Errors.CALLER_MUST_BE_OWNER);
         tvm.accept();
-        dest.transfer(value, bounce, flags, payload);
+        dest.transfer(value, bounce, flag, payload);
     }
 
     function acceptTransfer(bytes payload) external override {
@@ -44,22 +44,22 @@ contract AtomicSwapWallet is IAccept, IAtomicSwapWallet {
         uint32 timeLock,
         TvmCell data
     ) external override returns (address) {
-        require(msg.pubkey() == tvm.pubkey() || !msg.sender.isNone(), Errors.CALLER_MUST_BE_OWNER_OR_CONTRACT);
-        require(!initiator.isNone(), Errors.ADDRESS_IS_NONE);
-        require(!participant.isNone(), Errors.ADDRESS_IS_NONE);
+        if (msg.pubkey() == tvm.pubkey()) {
+            tvm.accept();
+            require(address(this).balance >= amount + Fees.ATOMIC_SWAP_CREATE, Errors.BALANCE_INSUFFICIENT);
+        } else if (msg.sender != address(0)) {
+            require(msg.value >= amount + Fees.ATOMIC_SWAP_CREATE, Errors.BALANCE_INSUFFICIENT);
+        } else {
+            revert(Errors.CALLER_MUST_BE_OWNER_OR_CONTRACT);
+        }
         require(timeLock > now && timeLock < now + Time.MAX_TIME_LOCK, Errors.TIME_LOCK_INVALID);
 
-        if (msg.sender.isNone()) {
-            require(address(this).balance >= amount + Fees.ATOMIC_SWAP_CREATE, Errors.BALANCE_INSUFFICIENT);
-        } else {
-            require(msg.value >= amount + Fees.ATOMIC_SWAP_CREATE, Errors.BALANCE_INSUFFICIENT);
-        }
 
         TvmCell atomicSwapStateInit = tvm.buildStateInit(codeAtomicSwap, data);
                 
         address atomicSwap = new AtomicSwap {
             stateInit: atomicSwapStateInit,
-            value: amount + 1_000_000_000,
+            value: amount + Fees.ATOMIC_SWAP_CREATE,
             flag: 1
         } (
             initiator,
@@ -69,5 +69,9 @@ contract AtomicSwapWallet is IAccept, IAtomicSwapWallet {
         );
         
         return atomicSwap;
+    }
+
+    function hashSecret(bytes secret) public pure returns (uint256) {
+        return uint256(sha256(secret));
     }
 }
