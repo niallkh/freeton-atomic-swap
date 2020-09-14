@@ -68,13 +68,11 @@ describe('Atomic Swap Refund', function () {
         }))['value0']
 
         amount = 10_000_000_000 // 10 ton
-
-        console.log(`secret    =${secret}`)
-        console.log(`secretHash=${secretHash}`)
     })
 
     it('create Atomic Swap', async () => {
 
+        // Create Atomic Swap
         const data = await client.contracts.getDeployData({
             abi: AtomicSwapContract.package.abi,
             initParams: {
@@ -90,10 +88,13 @@ describe('Atomic Swap Refund', function () {
             'timeLock': parseInt(Date.now() / 1000) + 2,
             'data': data.dataBase64
         })
+
+        // Return address of Atomic Swap
         const atomicSwapAddress = result['value0']
         expect(atomicSwapAddress).to.be.not.equal(undefined)
         atomicSwapContract = new AtomicSwapContract(client, atomicSwapAddress)
 
+        // Check that participant accepted transfer
         const messages = (await client.queries.messages.query({
                 src: { eq: participantContract.address },
                 msg_type: { eq: 2 },

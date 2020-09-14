@@ -1,11 +1,11 @@
 /* eslint-env mocha */
 const expect = require('chai').expect
 const getGramsFromGiver = require('./giver.js')
-const AtomicSwapWalletContract = require('../contracts/AtomicSwapWalletContract.js')
 const AtomicSwapContract = require('../contracts/AtomicSwapContract.js')
+const MultisigWalletContract = require('../contracts/SetcodeMultisigWalletContract.js')
 const { TONClient } = require('ton-client-node-js')
 
-describe('Atomic Swap Redeem', function () {
+describe('Atomic Swap Multisig Wallet Redeem', function () {
     this.timeout(5000)
 
     let client
@@ -28,20 +28,21 @@ describe('Atomic Swap Redeem', function () {
         participantKeyPair = await client.crypto.ed25519Keypair()
 
         secret = await client.crypto.randomGenerateBytes(32)
-
-        const codeAtomicSwap = await client.contracts.getCodeFromImage({
-            imageBase64: AtomicSwapContract.package.imageBase64
-        })
-
-        const constructorParams = { '_codeAtomicSwap': codeAtomicSwap.codeBase64 }
+        secretHash = await client.crypto.sha256({ hex: secret })
+        amount = 10_000_000_000 // 10 ton
 
         // Deploy Initiator Wallet
         {
+            const constructorParams = {
+                owners: [`0x${initiatorKeyPair.public}`],
+                reqConfirms:1
+            }
+
             const address = await getFutureAddress(
-                client, AtomicSwapWalletContract.package, initiatorKeyPair, constructorParams
+                client, MultisigWalletContract.package, initiatorKeyPair, constructorParams
             )
             await getGramsFromGiver(client, address, 100_000_000_000)
-            initiatorContract = new AtomicSwapWalletContract(client, address, initiatorKeyPair)
+            initiatorContract = new MultisigWalletContract(client, address, initiatorKeyPair)
             await initiatorContract.deploy(constructorParams)
             await client.queries.accounts.waitFor({
                 id: { eq: address },
@@ -51,48 +52,52 @@ describe('Atomic Swap Redeem', function () {
 
         // Deploy Participant Wallet
         {
+            const constructorParams = {
+                owners: [`0x${participantKeyPair.public}`],
+                reqConfirms:1
+            }
+
             const address = await getFutureAddress(
-                client, AtomicSwapWalletContract.package, participantKeyPair, constructorParams
+                client, MultisigWalletContract.package, participantKeyPair, constructorParams
             )
             await getGramsFromGiver(client, address, 1_000_000_000)
-            participantContract = new AtomicSwapWalletContract(client, address, participantKeyPair)
+            participantContract = new MultisigWalletContract(client, address, participantKeyPair)
             await participantContract.deploy(constructorParams)
             await client.queries.accounts.waitFor({
                 id: { eq: address },
                 acc_type_name: { eq: 'Active' }
             }, 'id')
-        }
-
-        secretHash = (await initiatorContract.hashSecretLocal({
-            secret: secret, 
-        }))['value0']
-
-        amount = 10_000_000_000 // 10 ton
+        } 
     })
 
     it('create Atomic Swap', async () => {
-
-        // Create Atomic Swap
-        const data = await client.contracts.getDeployData({
-            abi: AtomicSwapContract.package.abi,
-            initParams: {
-                secretHash: `${secretHash}`,
-            },
-            publicKeyHex: '0000000000000000000000000000000000000000000000000000000000000000'
-        })
         
-        const result = await initiatorContract.createSwap({
-            'initiator': initiatorContract.address, 
-            'participant': participantContract.address, 
-            'amount': 10_000_000_000,
-            'timeLock': parseInt(Date.now() / 1000) + 60,
-            'data': data.dataBase64
+        // Create Atomic Swap
+        const constructorParams = {
+            '_initiator': initiatorContract.address, 
+            '_participant': participantContract.address, 
+            '_amount': amount, 
+            '_timeLock': parseInt(Date.now() / 1000) + 60
+        }
+
+        const initParams = {
+            secretHash: `0x${secretHash}`,
+        };
+
+        const atomicSwapFutureAddress = await getFutureAddress(
+            client, AtomicSwapContract.package, initiatorKeyPair, constructorParams, initParams
+        )
+
+        await initiatorContract.sendTransaction({ 
+            dest: atomicSwapFutureAddress,
+            value: 1_000_000_000, // send 1 ton with bounce=false, the rest later
+            bounce: false,
+            flags: 1,
+            payload: ""
         })
 
-        // Return address of Atomic Swap
-        const atomicSwapAddress = result['value0']
-        expect(atomicSwapAddress).to.be.not.equal(undefined)
-        atomicSwapContract = new AtomicSwapContract(client, atomicSwapAddress)
+        atomicSwapContract = new AtomicSwapContract(client, atomicSwapFutureAddress, initiatorKeyPair);
+        await atomicSwapContract.deploy(constructorParams, initParams)
 
         // Check that participant accepted transfer
         const messages = (await client.queries.messages.query({
@@ -102,14 +107,22 @@ describe('Atomic Swap Redeem', function () {
         ))
 
         const events = await Promise.all(messages.map(async msg => await client.contracts.decodeOutputMessageBody({
-            abi: AtomicSwapWalletContract.package.abi,
+            abi: MultisigWalletContract.package.abi,
             bodyBase64: msg['body'],
             internal: false,
         })))
 
         const onInitiateEvent = events.find(event => event.function == "TransferAccepted")    
         expect(htoa(onInitiateEvent.output.payload)).to.be.equal("Atomic Swap")
-           
+            
+        // Send rest tons  
+        await initiatorContract.sendTransaction({ 
+            dest: atomicSwapFutureAddress,
+            value: 9_000_000_000 + 10_000_000,
+            bounce: true,
+            flags: 1,
+            payload: ""
+        })
     })
 
     it('check params of Atomic Swap', async () => {
@@ -122,7 +135,7 @@ describe('Atomic Swap Redeem', function () {
         expect(parseInt(params['_timeLock'], 16), 'expired time').to.be.gt(Date.now() / 1000)
         expect(params['_initiator'], 'initiator').to.be.equal(`${initiatorContract.address}`)
         expect(params['_participant'], 'participant').to.be.equal(`${participantContract.address}`)
-        expect(params['_secretHash'], 'secret hash').to.be.equal(`${secretHash}`)
+        expect(params['_secretHash'], 'secret hash').to.be.equal(`0x${secretHash}`)
     })
 
     it('redeem by participant', async () => {
@@ -141,7 +154,7 @@ describe('Atomic Swap Redeem', function () {
             dest: atomicSwapContract.address,
             value: 10_000_000,
             bounce: true,
-            flag: 1,
+            flags: 1,
             payload: runBody.bodyBase64
         }
         await participantContract.sendTransaction(params)
@@ -177,11 +190,12 @@ describe('Atomic Swap Redeem', function () {
     })
 })
 
-async function getFutureAddress(client, package, keyPair, constructorParams = {}) {
+async function getFutureAddress(client, package, keyPair, constructorParams = {}, initParams = {}) {
     return (await client.contracts.createDeployMessage({
         package,
         constructorParams,
         keyPair,
+        initParams
     })).address
 }
 

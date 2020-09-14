@@ -38,6 +38,9 @@ contract AtomicSwap is IAtomicSwap {
         uint32 _timeLock
     ) public {
         require(_timeLock > now && _timeLock < now + Time.MAX_TIME_LOCK, Errors.TIME_LOCK_INVALID);
+        if (msg.sender == address(0)) {
+            tvm.accept();
+        }
 
         initiator = _initiator;
         participant = _participant;

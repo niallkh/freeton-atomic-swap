@@ -447,13 +447,16 @@ SENDRAWMSG
 NIP
 ;; decl: atomicSwap
 ;; return
-XCHG s6
-BLKDROP 6
-;; emitting 1 value(s)
-PUSH S1
+;; push identifier atomicSwap
+DUP
+;; push identifier data
+PUSH S3
+BLKDROP2 7, 2
+;; emitting 2 value(s)
+PUSH S2
 EQINT -1
 PUSHCONT {
-	PUSH S3
+	PUSH S4
 	CTOS
 	LDU 2
 	LDMSGADDR
@@ -466,15 +469,17 @@ PUSHCONT {
 	STZEROES
 	STSLICECONST 0
 	STSLICECONST 0
-	STSLICECONST xed09060c
-	PUSH S1
+	STSLICECONST xa90e07a8
+	PUSH S2
 	STSLICER
+	PUSH S1
+	STREFR
 	ENDC
 	PUSHINT 1
 	SENDRAWMSG
 }
 IF
-DROP
+DROP2
 ; end function createSwap
 CALL $c7_to_c4$
 TRUE
@@ -620,8 +625,11 @@ SENDRAWMSG
 NIP
 ;; decl: atomicSwap
 ;; return
-XCHG s6
-BLKDROP 6
+;; push identifier atomicSwap
+DUP
+;; push identifier data
+PUSH S3
+BLKDROP2 7, 2
 ; end function createSwap
 
 .globl	hashSecret

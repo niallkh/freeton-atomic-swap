@@ -74,6 +74,16 @@ PUSHCONT {
 }
 IF
 THROWIFNOT 104
+;; if
+;; get member sender
+GETGLOB 9
+PUSHSLICE x8000000000000000000000000000000000000000000000000000000000000000001_
+SDEQ
+PUSHCONT {
+	ACCEPT
+}
+IF
+;; end if
 ; expValue
 ; end expValue
 ;; push identifier _initiator

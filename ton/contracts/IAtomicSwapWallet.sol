@@ -8,5 +8,5 @@ interface IAtomicSwapWallet {
         uint128 amount,
         uint32 timeLock,
         TvmCell data
-    ) external returns (address);
+    ) external returns (address, TvmCell);
 }
