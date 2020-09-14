@@ -69,7 +69,6 @@ contract("AtomicSwap refund erc20", async accounts => {
         await delay(3_000)
     })
 
-
     it('redeem', async () => {
         const balanceBeforeSwap = await erc20TokenContract.balanceOf(initiator)
 

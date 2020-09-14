@@ -5,7 +5,7 @@ const AtomicSwapWalletContract = require('../contracts/AtomicSwapWalletContract.
 const AtomicSwapContract = require('../contracts/AtomicSwapContract.js')
 const { TONClient } = require('ton-client-node-js')
 
-describe('Atomic Swap Redeem', function () {
+describe('Atomic Swap Refund', function () {
     this.timeout(5000)
 
     let client
@@ -75,7 +75,6 @@ describe('Atomic Swap Redeem', function () {
 
     it('create Atomic Swap', async () => {
 
-        // Create Atomic Sswap
         const data = await client.contracts.getDeployData({
             abi: AtomicSwapContract.package.abi,
             initParams: {
@@ -88,16 +87,13 @@ describe('Atomic Swap Redeem', function () {
             'initiator': initiatorContract.address, 
             'participant': participantContract.address, 
             'amount': 10_000_000_000,
-            'timeLock': parseInt(Date.now() / 1000) + 60,
+            'timeLock': parseInt(Date.now() / 1000) + 2,
             'data': data.dataBase64
         })
-
-        // Return address of Atomic Swap
         const atomicSwapAddress = result['value0']
         expect(atomicSwapAddress).to.be.not.equal(undefined)
         atomicSwapContract = new AtomicSwapContract(client, atomicSwapAddress)
 
-        // Check that participant accepted transfer
         const messages = (await client.queries.messages.query({
                 src: { eq: participantContract.address },
                 msg_type: { eq: 2 },
@@ -111,68 +107,54 @@ describe('Atomic Swap Redeem', function () {
         })))
 
         const onInitiateEvent = events.find(event => event.function == "TransferAccepted")    
-        expect(htoa(onInitiateEvent.output.payload)).to.be.equal("Atomic Swap")
-           
+        expect(htoa(onInitiateEvent.output.payload)).to.be.equal("Atomic Swap")     
+    })
+
+
+    it('wait until Atomic Swap expired', async function() {
+        this.timeout(3_500)
+        await delay(3_000)
     })
 
     it('check params of Atomic Swap', async () => {
 
         const params = await atomicSwapContract.paramsLocal()
 
-        // check params of Atomic Swap
+        // check params of Atomic Swap, should be expired
         expect(parseInt(params['_amount'], 16), 'amount').to.be.equal(amount)
         expect(parseInt(params['_balance'], 16), 'balance gt').to.be.gt(amount)
-        expect(parseInt(params['_timeLock'], 16), 'expired time').to.be.gt(Date.now() / 1000)
+        expect(parseInt(params['_timeLock'], 16), 'expired time').to.be.lt(parseInt(Date.now() / 1000))
         expect(params['_initiator'], 'initiator').to.be.equal(`${initiatorContract.address}`)
         expect(params['_participant'], 'participant').to.be.equal(`${participantContract.address}`)
         expect(params['_secretHash'], 'secret hash').to.be.equal(`${secretHash}`)
     })
 
-    it('redeem by participant', async () => {
+    it('refund by initiator', async () => {
 
-        // redeem Atomic Swap
+        // refund Atomic Swap
         const runBody = await client.contracts.createRunBody({
             abi: AtomicSwapContract.package.abi,
-            function: "redeem",
-            params: {
-                secret: `${secret}`,
-            },
+            function: "refund",
+            params: {},
             internal: true,
         })
 
         const params = { 
             dest: atomicSwapContract.address,
-            value: 10_000_000,
+            value: 10_000_000, // fee
             bounce: true,
             flag: 1,
             payload: runBody.bodyBase64
         }
-        await participantContract.sendTransaction(params)
+        await initiatorContract.sendTransaction(params)
 
-        // check Redeemed event and acquire secret
-        {
-            const msg = await client.queries.messages.waitFor({
-                    src: { eq: atomicSwapContract.address },
-                    msg_type: { eq: 2 },
-                }, "body"
-            )
-            const event = await client.contracts.decodeOutputMessageBody({
-                abi: AtomicSwapContract.package.abi,
-                bodyBase64: msg['body'],
-                internal: false,
-            })
-
-            expect(event.function).to.be.equal("Redeemed")
-            expect(event.output.secret).to.be.equal(`${secret}`)       
-        }
-
-        // check that balance of participant is more
-        const participantBalance = (await client.queries.accounts.query({
-                id: { eq: participantContract.address },
+        // check that balance of initiator as before with the exception of fees
+        const initiatorBalance = (await client.queries.accounts.query({
+                id: { eq: initiatorContract.address },
             }, "balance"
         ))[0]['balance']
 
-        expect(parseInt(participantBalance, 16)).to.be.gt(10_999_000_000)
+        expect(parseInt(initiatorBalance, 16)).to.be.gt(99_999_000_000)
     })
 
     after(async () => {
@@ -194,4 +176,12 @@ function htoa(hex) {
         str += String.fromCharCode(parseInt(hex.substr(i, 2), 16)); 
     }
     return str;
+}
+
+async function delay(time) {
+    return new Promise(res => {
+        setTimeout(function() {
+            res()
+        }, time);
+    })
 }

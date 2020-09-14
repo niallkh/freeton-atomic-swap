@@ -43,7 +43,7 @@ contract AtomicSwapWallet is IAccept, IAtomicSwapWallet {
         uint128 amount,
         uint32 timeLock,
         TvmCell data
-    ) external override returns (address) {
+    ) external override returns (address, TvmCell) {
         if (msg.pubkey() == tvm.pubkey()) {
             tvm.accept();
             require(address(this).balance >= amount + Fees.ATOMIC_SWAP_CREATE, Errors.BALANCE_INSUFFICIENT);
@@ -68,7 +68,7 @@ contract AtomicSwapWallet is IAccept, IAtomicSwapWallet {
             timeLock
         );
         
-        return atomicSwap;
+        return (atomicSwap, data);
     }
 
     function hashSecret(bytes secret) public pure returns (uint256) {
