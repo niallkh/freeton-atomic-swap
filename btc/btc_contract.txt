@@ -1,0 +1,102 @@
+
+b.AddData(sig)
+b.AddData(pubkey)
+b.AddInt64(0)
+b.AddData(contract)
+
+
+b.AddData(sig)
+b.AddData(pubkey)
+b.AddData(secret)
+b.AddInt64(1)
+b.AddData(contract)
+
+============================================================================
+
+b.AddOp(txscript.OP_IF) // Normal redeem path
+{
+    // Require initiator's secret to be a known length that the redeeming
+    // party can audit.  This is used to prevent fraud attacks between two
+    // currencies that have different maximum data sizes.
+    b.AddOp(txscript.OP_SIZE)
+    b.AddInt64(secretSize)
+    b.AddOp(txscript.OP_EQUALVERIFY)
+
+    // Require initiator's secret to be known to redeem the output.
+    b.AddOp(txscript.OP_SHA256)
+    b.AddData(secretHash)
+    b.AddOp(txscript.OP_EQUALVERIFY)
+
+    // Verify their signature is being used to redeem the output.  This
+    // would normally end with OP_EQUALVERIFY OP_CHECKSIG but this has been
+    // moved outside of the branch to save a couple bytes.
+    b.AddOp(txscript.OP_DUP)
+    b.AddOp(txscript.OP_HASH160)
+    b.AddData(pkhThem[:])
+}
+b.AddOp(txscript.OP_ELSE) // Refund path
+{
+    // Verify locktime and drop it off the stack (which is not done by
+    // CLTV).
+    b.AddInt64(locktime)
+    b.AddOp(txscript.OP_CHECKLOCKTIMEVERIFY)
+    b.AddOp(txscript.OP_DROP)
+
+    // Verify our signature is being used to redeem the output.  This would
+    // normally end with OP_EQUALVERIFY OP_CHECKSIG but this has been moved
+    // outside of the branch to save a couple bytes.
+    b.AddOp(txscript.OP_DUP)
+    b.AddOp(txscript.OP_HASH160)
+    b.AddData(pkhMe[:])
+}
+b.AddOp(txscript.OP_ENDIF)
+
+// Complete the signature check.
+b.AddOp(txscript.OP_EQUALVERIFY)
+b.AddOp(txscript.OP_CHECKSIG)
+
+return b.Script()
+
+
+===========================
+Redeem script
+
+Participant Contract:
+{{signature}}
+{{participantPubkey}}
+{{secret}}
+1 // redeem command
+
+Initiator Contract:
+{{signature}}
+{{initiatorPubKey}}
+0 // refund command
+
+Atomic Swap Contract:
+
+OP_IF
+
+    OP_SHA256
+    {{secretHash}}
+    OP_EQUALVERIFY
+
+    OP_DUP
+    OP_HASH160
+    {{participantPubKey}}
+    OP_EQUALVERIFY
+    OP_CHECKSIG
+
+
+OP_ELSE
+
+    {{lockTime}}
+    OP_CHECKLOCKTIMEVERIFY
+    OP_DROP
+
+    OP_DUP
+    OP_HASH160
+    {{initiatorPubKey}}
+    OP_EQUALVERIFY
+    OP_CHECKSIG
+
+OP_ENDIF
