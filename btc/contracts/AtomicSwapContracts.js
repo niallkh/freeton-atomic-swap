@@ -4,8 +4,12 @@ function createAtomicSwapScript(secretHash, initiatorPubKey, participantPubKey, 
     return bitcoin.script.fromASM(
         `
         OP_IF
+            OP_SIZE
+            20
+            OP_EQUALVERIFY
+
             OP_SHA256
-            ${secretHash}}
+            ${secretHash}
             OP_EQUALVERIFY
 
             OP_DUP
@@ -32,10 +36,10 @@ function createAtomicSwapScript(secretHash, initiatorPubKey, participantPubKey, 
 function createAtomicSwapRedeemScript(signature, participantPubKey, secret) {
     return bitcoin.script.fromASM(
         `
-        ${signature}
-        ${participantPubkey.toString('hex')}
+        ${signature.toString('hex')}
+        ${participantPubKey.toString('hex')}
         ${secret}
-        1
+        01
         `
         .trim()
         .replace(/\s+/g, ' '),
@@ -45,9 +49,9 @@ function createAtomicSwapRedeemScript(signature, participantPubKey, secret) {
 function createAtomicSwapRefundScript(signature, initiatorPubKey) {
     return bitcoin.script.fromASM(
         `
-        ${signature}
+        ${signature.toString('hex')}
         ${initiatorPubKey.toString('hex')}
-        0
+        00
         `
         .trim()
         .replace(/\s+/g, ' '),
