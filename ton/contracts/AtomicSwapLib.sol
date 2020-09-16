@@ -15,7 +15,7 @@ library Errors {
 }
 
 library Fees {
-    uint128 constant ATOMIC_SWAP_CREATE = 10 milliton;
+    uint128 constant ATOMIC_SWAP_CREATE = 40 milliton;
     uint128 constant ATOMIC_SWAP_REDEEM = 10 milliton;
     uint128 constant ATOMIC_SWAP_REFUND = 10 milliton;
     uint128 constant ATOMIC_SWAP_FWD_ACCEPT = 1 milliton;

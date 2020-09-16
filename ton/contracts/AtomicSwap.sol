@@ -68,6 +68,7 @@ contract AtomicSwap is IAtomicSwap {
         address _initiator,
         address _participant,
         uint32 _timeLock,
+        uint32 _now,
         uint256 _secretHash,
         uint128 _amount,
         uint256 _balance
@@ -78,6 +79,7 @@ contract AtomicSwap is IAtomicSwap {
         _secretHash = secretHash;
         _amount = amount;
         _balance = address(this).balance;
+        _now = uint32(now);
     }
 
     function canRedeen(bytes secret) public view returns (bool) {

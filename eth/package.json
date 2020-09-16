@@ -1,5 +1,5 @@
 {
-  "name": "eth",
+  "name": "freeton-atomic-swap-eth",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",

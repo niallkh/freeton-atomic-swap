@@ -1,0 +1,28 @@
+{
+  "name": "freeton-atomic-swap",
+  "version": "1.0.0",
+  "description": "restrictions: 1. Users should have own wallets on ton and eth.",
+  "main": "./app/app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nailkhaf/freeton-atomic-swap.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nailkhaf/freeton-atomic-swap/issues"
+  },
+  "homepage": "https://github.com/nailkhaf/freeton-atomic-swap#readme",
+  "dependencies": {
+    "commander": "^6.1.0",
+    "dotenv": "^8.2.0",
+    "freeton-atomic-swap-btc": "./btc",
+    "freeton-atomic-swap-eth": "./eth",
+    "freeton-atomic-swap-ton": "./ton",
+    "ton-client-node-js": "^0.26.0"
+  }
+}

@@ -64,7 +64,7 @@ describe('Atomic Swap Redeem', function () {
         }
 
         secretHash = (await initiatorContract.hashSecretLocal({
-            secret: secret, 
+            secret: secret,
         }))['value0']
 
         amount = 10_000_000_000 // 10 ton
