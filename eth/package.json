@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "truffle test",
-    "build": "truffle compile"
+    "build": "truffle compile",
+    "deploy": "truffle migrate",
+    "deploy-ropsten": "truffle migrate --network ropsten"
   },
   "keywords": [],
   "author": "",

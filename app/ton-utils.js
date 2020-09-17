@@ -1,13 +1,6 @@
 const { AtomicSwapContract, MultisigWalletContract, AtomicSwapWalletContract } = require("freeton-atomic-swap-ton")
-const { createSecretAndHash } = require("freeton-atomic-swap-btc")
-const util = require('util');
-const fs = require('fs')
 const { TONClient } = require('ton-client-node-js')
-
-const readAsync = util.promisify(fs.readFile);
-const writeAsync = util.promisify(fs.writeFile);
-const accessAsync = util.promisify(fs.access);
-const unlinkAsync = util.promisify(fs.unlink);
+const { save, load, prettyNumber, resetStorage } = require('./common-utils.js')
 
 async function createClient(block) {
     const client = await TONClient.create({servers: [process.env.TON_SERVER]})
@@ -76,41 +69,6 @@ async function getKeyPair(client) {
     }
 }   
 
-async function save(update) {
-    const db = await load()
-    await writeAsync(dbName(), JSON.stringify({ ...db, ...update }, null, 2))
-}
-
-async function load() {
-    const db = dbName()
-    try {
-        await accessAsync(db, fs.constants.F_OK)
-        return JSON.parse(await readAsync(db))
-    } catch(e) {
-        return {}
-    }
-}
-
-async function resetStorage() {
-    await writeAsync(dbName(), JSON.stringify({}, null, 2))
-}
-
-function prettyNumber(balance) {
-    const str = balance.toString()
-    let result = ""
-    for (let i = 0; i < str.length; i++) {
-        result += str[i]
-        if (i != str.length - 1 && (str.length - i) % 3 == 1) {
-          result += '_'
-        }
-    }
-    return result
-}
-
-function dbName() {
-    return `${process.env.USER}-${process.env.DB_NAME}.json`
-}
-
 module.exports = {
     createClient,
     getFutureAddress,
@@ -118,7 +76,6 @@ module.exports = {
     getBalance,
     getAccountState,
     waitActiveState,
-    createSecretAndHash,
     getWalletAddress,
     saveWalletAddress,
     prettyNumber,

@@ -18,9 +18,9 @@ contract AtomicSwap {
 
     mapping(uint256 => Swap) atomicSwaps;
 
-    event AtomicSwapCreated(uint256 secretHash);
+    event AtomicSwapCreated(uint256 indexed secretHash);
 
-    event Redeemed(bytes secret);
+    event Redeemed(uint256 indexed secretHash, bytes secret);
     
     function createSwap(uint256 secretHash, address participant, uint256 value, uint256 timeLock) external payable {
         require(!atomicSwaps[secretHash].exists, "Atomic Swap already created");
@@ -79,7 +79,7 @@ contract AtomicSwap {
             participant.transfer(swap.value);
         }
 
-        emit Redeemed(secret);
+        emit Redeemed(secretHash, secret);
     }
 
     function refund(uint256 secretHash) external {
@@ -121,4 +121,3 @@ contract AtomicSwap {
         return uint256(sha256(secret));
     }
 }
-
