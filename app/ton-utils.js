@@ -1,6 +1,6 @@
 const { AtomicSwapContract, MultisigWalletContract, AtomicSwapWalletContract } = require("freeton-atomic-swap-ton")
 const { TONClient } = require('ton-client-node-js')
-const { save, load, prettyNumber, resetStorage } = require('./common-utils.js')
+const { save, load, prettyNumber } = require('./common-utils.js')
 
 async function createClient(block) {
     const client = await TONClient.create({servers: [process.env.TON_SERVER]})
@@ -15,7 +15,7 @@ async function createClient(block) {
 
 async function getBalance(client, address) {
     const balance = (await client.queries.accounts.query({
-            id: { eq: address },
+        id: { eq: address },
     }, "balance"
     ))[0]['balance']
 
@@ -34,6 +34,15 @@ async function getAccountState(client, address) {
         id: { eq: address },
     }, 'acc_type_name'
     ))[0]['acc_type_name']
+}
+
+async function getCodeHash(client, address) {
+    const codeHash = (await client.queries.accounts.query({
+        id: { eq: address },
+    }, "code_hash"
+    ))[0]['code_hash']
+
+    return codeHash
 }
 
 async function saveWalletAddress(address) {
@@ -79,5 +88,5 @@ module.exports = {
     getWalletAddress,
     saveWalletAddress,
     prettyNumber,
-    resetStorage
+    getCodeHash    
 }

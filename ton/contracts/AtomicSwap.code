@@ -407,6 +407,8 @@ PUSHSLICE x8000000000000000000000000000000000000000000000000000000000000000001_
 PUSHSLICE x8000000000000000000000000000000000000000000000000000000000000000001_
 ;; ret param: _timeLock
 PUSHINT 0
+;; ret param: _now
+PUSHINT 0
 ;; ret param: _secretHash
 PUSHINT 0
 ;; ret param: _amount
@@ -418,21 +420,21 @@ PUSHINT 0
 ;; push identifier initiator
 GETGLOB 10
 ; colValue
-POP s6
+POP s7
 ; end colValue
 ; expValue
 ; end expValue
 ;; push identifier participant
 GETGLOB 11
 ; colValue
-POP s5
+POP s6
 ; end colValue
 ; expValue
 ; end expValue
 ;; push identifier timeLock
 GETGLOB 12
 ; colValue
-POP s4
+POP s5
 ; end colValue
 ; expValue
 ; end expValue
@@ -456,12 +458,21 @@ INDEX 0
 ; colValue
 NIP
 ; end colValue
+;; push identifier now
+NOW
+;; uint32
+UFITS 32
+; expValue
+; end expValue
+; colValue
+POP s4
+; end colValue
 ;; returning named params
-;; emitting 6 value(s)
-PUSH S6
+;; emitting 7 value(s)
+PUSH S7
 EQINT -1
 PUSHCONT {
-	PUSH S8
+	PUSH S9
 	CTOS
 	LDU 2
 	LDMSGADDR
@@ -475,11 +486,13 @@ PUSHCONT {
 	STSLICECONST 0
 	STSLICECONST 1
 	NEWC
-	STSLICECONST xa49b8262
+	STSLICECONST x866ad567
+	PUSH S8
+	STSLICER
 	PUSH S7
 	STSLICER
 	PUSH S6
-	STSLICER
+	STUR 32
 	PUSH S5
 	STUR 32
 	PUSH S4
@@ -496,7 +509,7 @@ PUSHCONT {
 	SENDRAWMSG
 }
 IF
-BLKDROP 6
+BLKDROP 7
 ; end function params
 EQINT -1
 PUSHCONT {
@@ -515,6 +528,8 @@ PUSHSLICE x8000000000000000000000000000000000000000000000000000000000000000001_
 PUSHSLICE x8000000000000000000000000000000000000000000000000000000000000000001_
 ;; ret param: _timeLock
 PUSHINT 0
+;; ret param: _now
+PUSHINT 0
 ;; ret param: _secretHash
 PUSHINT 0
 ;; ret param: _amount
@@ -526,21 +541,21 @@ PUSHINT 0
 ;; push identifier initiator
 GETGLOB 10
 ; colValue
-POP s6
+POP s7
 ; end colValue
 ; expValue
 ; end expValue
 ;; push identifier participant
 GETGLOB 11
 ; colValue
-POP s5
+POP s6
 ; end colValue
 ; expValue
 ; end expValue
 ;; push identifier timeLock
 GETGLOB 12
 ; colValue
-POP s4
+POP s5
 ; end colValue
 ; expValue
 ; end expValue
@@ -563,6 +578,15 @@ INDEX 0
 ; end expValue
 ; colValue
 NIP
+; end colValue
+;; push identifier now
+NOW
+;; uint32
+UFITS 32
+; expValue
+; end expValue
+; colValue
+POP s4
 ; end colValue
 ;; returning named params
 ; end function params

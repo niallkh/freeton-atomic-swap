@@ -38,7 +38,7 @@ tonCmd.command('balance')
     .action(async () => {
         await handleAction(async () => {
             const result = await ton.getWalletBalance()
-            console.log(`Atomic Swap Wallet:\n${JSON.stringify(result, null, 2)}`)
+            console.log(`Atomic Swap Wallet balance:\n${JSON.stringify(result, null, 2)}`)
         })
     })
 
@@ -192,7 +192,7 @@ ethCmd.command('participate <participant> <eths> <secret-hash> [timeSec]')
                 secretHash,
                 options.erc20
             )
-            console.log(`Atomic Swap created, params:\n${JSON.stringify(result, null, 2)}`)
+            console.log(`Atomic Swap created`)
         })
     })
 
@@ -241,6 +241,8 @@ ethCmd.command('transfer <address> <eths>')
         })
     })
 
+const btcCmd = program.command('btc')
+    .description("command for bitcoin blockchain")
 
 program.command('reset')
     .description('reset keys and wallets')

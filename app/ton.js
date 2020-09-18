@@ -1,6 +1,12 @@
 const { AtomicSwapContract, MultisigWalletContract, AtomicSwapWalletContract, getGramsFromGiver } = require("freeton-atomic-swap-ton")
 const { TONClient } = require('ton-client-node-js')
-const { createClient, getFutureAddress, getKeyPair, getBalance, waitActiveState, getAccountState, createSecretAndHash, saveWalletAddress, getWalletAddress, prettyNumber, resetStorage } = require('./ton-utils.js')
+const { 
+    createClient, getFutureAddress, getKeyPair, 
+    getBalance, waitActiveState, getAccountState, 
+    saveWalletAddress, getWalletAddress, getCodeHash
+} = require('./ton-utils.js')
+
+const { createSecretAndHash, prettyNumber, resetStorage } = require('./common-utils.js')
 
 async function computeAtomicSwapWalletAddress() {
     return await createClient(async client => {
@@ -52,10 +58,7 @@ async function getWalletBalance() {
         const walletAddress = await getWalletAddress()        
         const balance = prettyNumber(await getBalance(client, walletAddress))
 
-        return {
-            walletAddress,
-            balance
-        }
+        return balance
     })
 }
 
@@ -110,6 +113,7 @@ async function getAtomicSwapParams(address) {
             atomicSwapBalance: prettyNumber(parseInt(params['_balance'], 16)),
             now: prettyNumber(parseInt(params['_now'], 16)),
             timeLock: prettyNumber(parseInt(params['_timeLock'], 16)),
+            codeHash: await getCodeHash(client, address)
         }
     })
 }

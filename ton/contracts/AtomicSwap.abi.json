@@ -36,6 +36,7 @@
 				{"name":"_initiator","type":"address"},
 				{"name":"_participant","type":"address"},
 				{"name":"_timeLock","type":"uint32"},
+				{"name":"_now","type":"uint32"},
 				{"name":"_secretHash","type":"uint256"},
 				{"name":"_amount","type":"uint128"},
 				{"name":"_balance","type":"uint256"}
