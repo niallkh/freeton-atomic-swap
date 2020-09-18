@@ -3,6 +3,14 @@ const bip65 = require('bip65')
 const crypto = require('crypto')
 const { createAtomicSwapScript, createAtomicSwapRedeemScript, createAtomicSwapRefundScript } = require('./AtomicSwapContracts.js')
 
+async function genWallet() {
+    return bitcoin.ECPair.makeRandom()
+}
+
+async function walletFrom(privateKey) {
+    return bitcoin.ECPair.fromPrivateKey(Buffer.from(privateKey, 'hex'))
+}
+
 async function createAtomicSwap(network, initiatorPK, participantPK, secretHash, timeLock) {
     const lockTime = bip65.encode({ utc: timeLock }) 
     
@@ -38,37 +46,31 @@ async function createRedeemScript(network, initiatorPK, participant, participant
 
     psbt.addOutput({
       address: participantP2wpkh,
-      value: 999e5,
+      value: fee ? fee : 999e5,
     })
 
     psbt.signInput(0, participant)
 
-    try {
-        psbt.finalizeInput(0, (inputIndex, input, script) => {
-            
-            const decompiled = bitcoin.script.decompile(script)
-            if (!decompiled || decompiled[0] !== bitcoin.opcodes.OP_IF) {
-              throw new Error(`Can not finalize input #${inputIndex}`)
+    psbt.finalizeInput(0, (inputIndex, input, script) => {
+        
+        const decompiled = bitcoin.script.decompile(script)
+        if (!decompiled || decompiled[0] !== bitcoin.opcodes.OP_IF) {
+          throw new Error(`Can not finalize input #${inputIndex}`)
+        }
+
+        const redeemScript = createAtomicSwapRedeemScript(
+            input.partialSig[0].signature, participant.publicKey, secret
+        )
+
+        const payment = bitcoin.payments.p2sh({
+            redeem: {
+                input: redeemScript,
+                output: atomicSwapScript
             }
-
-            const redeemScript = createAtomicSwapRedeemScript(
-                input.partialSig[0].signature, participant.publicKey, secret
-            )
-
-            const payment = bitcoin.payments.p2sh({
-                redeem: {
-                    input: redeemScript,
-                    output: atomicSwapScript
-                }
-            })
-
-            return { finalScriptSig: payment.input }
         })
 
-    } catch(e) {
-        console.log(e)
-        throw e
-    }
+        return { finalScriptSig: payment.input }
+    })
 
     return psbt.extractTransaction().toHex()
 }
@@ -79,6 +81,8 @@ async function createRefundScript(network, initiator, participantPK, initiatorP2
         secretHash, initiator.publicKey, participantPK, lockTime
     )
     const psbt = new bitcoin.Psbt({network})
+
+    psbt.setLocktime(timeLock)
 
     psbt.addInput({
       hash: tx.id,
@@ -131,6 +135,15 @@ async function createSecretAndHash() {
     }
 }
 
+async function hashSecret(secret) {
+    const secretHash = await crypto.createHash('sha256')
+        .update(secret, 'hex')
+        .digest('hex')
+
+    return secretHash
+}
+
+
 async function createTimeLock(hours) {
     return Math.floor(Date.now() / 1000) + (3600 * hours)
 }
@@ -141,5 +154,8 @@ module.exports = {
     createRedeemScript,
     createRefundScript,
     createSecretAndHash,
-    createTimeLock
+    createTimeLock,
+    genWallet,
+    hashSecret,
+    walletFrom
 }

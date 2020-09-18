@@ -4,7 +4,10 @@ const {
     createRedeemScript,
     createRefundScript,
     createSecretAndHash,
-    createTimeLock
+    createTimeLock,
+    genWallet,
+    hashSecret,
+    walletFrom
 } = require("./contracts/AtomicSwap.js")
 
 module.exports = {
@@ -13,5 +16,8 @@ module.exports = {
     createRedeemScript,
     createRefundScript,
     createSecretAndHash,
-    createTimeLock    
+    createTimeLock,
+    genWallet,
+    hashSecret,
+    walletFrom
 }

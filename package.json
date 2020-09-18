@@ -19,6 +19,7 @@
   "homepage": "https://github.com/nailkhaf/freeton-atomic-swap#readme",
   "dependencies": {
     "@truffle/hdwallet-provider": "^1.0.44",
+    "bitcoinjs-lib": "^5.2.0",
     "commander": "^6.1.0",
     "dotenv": "^8.2.0",
     "ethereumjs-wallet": "^1.0.0",

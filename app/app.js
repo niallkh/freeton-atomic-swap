@@ -2,6 +2,7 @@ require('dotenv').config()
 const { program } = require('commander');
 const ton = require("./ton.js")
 const eth = require("./eth.js")
+const btc = require("./btc.js")
 
 async function handleAction(action) {
     try {
@@ -9,7 +10,7 @@ async function handleAction(action) {
         await action()
     } catch(e) {
         console.log(`Error: ${e.message}`)
-        // console.log(e)
+        console.log(e)
     } finally {
         process.exit() // freeton client couldn't close correctly
     }
@@ -243,6 +244,105 @@ ethCmd.command('transfer <address> <eths>')
 
 const btcCmd = program.command('btc')
     .description("command for bitcoin blockchain")
+
+btcCmd.command('get-wallet')
+    .description('get keys of your wallet')
+    .action(async () => {
+        await handleAction(async () => {
+            const wallet = await btc.getWallet()
+            console.log(`Bitcoin Wallet: ${JSON.stringify(wallet, null, 2)}`)            
+        })
+    })
+
+btcCmd.command('initiate <participant> [timeSec]')
+    .description('generate address of AtomicSwap')
+    .action(async (participant, time) => {
+        await handleAction(async () => {
+            const lockTime = time ? parseInt(time) : parseInt(process.env.DEFAULT_LOCK_TIME)
+
+            const atomicSwapParams = await btc.createAtomicSwap(
+                participant, parseInt(Date.now() / 1000) + lockTime * 2, undefined
+            )
+            console.log(`Bitcoin Atomic Swap params: ${JSON.stringify(atomicSwapParams, null, 2)}`)                        
+        })
+    })
+
+btcCmd.command('participate <participant> <secret-hash> [timeSec]')
+    .description('generate address of AtomicSwap')
+    .action(async (participant, secretHash, time) => {
+        await handleAction(async () => {
+            const lockTime = time ? parseInt(time) : parseInt(process.env.DEFAULT_LOCK_TIME)
+
+            const atomicSwapParams = await btc.createAtomicSwap(
+                participant, parseInt(Date.now() / 1000) + lockTime, secretHash
+            )
+            console.log(`Bitcoin Atomic Swap params: ${JSON.stringify(atomicSwapParams, null, 2)}`)                        
+        })
+    })
+
+btcCmd.command('verify <initiator> <secret-hash> <p2sh-address> <time-lock>')
+    .description('generate address of AtomicSwap')
+    .action(async (initiator, secretHash, p2shAddress, timeLock) => {
+        await handleAction(async () => {
+
+            const verified = await btc.verifyAtomicSwap(initiator, secretHash, parseInt(timeLock), p2shAddress)
+            console.log(`Bitcoin Atomic Swap verified: ${verified}`)                        
+        })
+    })
+
+btcCmd.command('redeem <initiator> <secret> <time-lock> <tx-id> <tx-vout> <tx-hex> [fee]')
+    .description('redeem Atomic Swap')
+    .action(async (initiator, secret, timeLock, txId, txVout, txHex, fee) => {
+        await handleAction(async () => {
+
+            const tx = {
+                id: txId,
+                vout: txVout,
+                hex: txHex
+            }
+
+            if (!fee) {
+                fee = 1e3;
+            }
+
+            const txRedeem = await btc.redeemAtomicSwap(
+                initiator,
+                secret,
+                timeLock,
+                tx,
+                fee
+            )
+            console.log(`Bitcoin Atomic Swap redeem transaction hex: ${txRedeem}`)                        
+        })
+    })
+
+btcCmd.command('reund <participant> <secret-hash> <time-lock> <tx-id> <tx-vout> <tx-hex> [fee]')
+    .description('reund Atomic Swap')
+    .action(async (participant, secretHash, timeLock, txId, txVout, txHex, fee) => {
+        await handleAction(async () => {
+
+            const tx = {
+                id: txId,
+                vout: txVout,
+                hex: txHex
+            }
+
+            if (!fee) {
+                fee = 1e3;
+            }
+
+            const txRedeem = await btc.redeemAtomicSwap(
+                participant,
+                secretHash,
+                timeLock,
+                tx,
+                fee
+            )
+            console.log(`Bitcoin Atomic Swap refund transaction hex: ${txRedeem}`)                        
+        })
+    })
+
+
 
 program.command('reset')
     .description('reset keys and wallets')

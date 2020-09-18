@@ -43,7 +43,7 @@ async function main() {
             vout: process.argv[4],
             hex: process.argv[5]
         }
-        const txRedeem = await createRedeemScript(network, keyPairDave.publicKey, keyPairAlice, alice[1].p2wpkh, secret, secretHash, timeLock, tx)
+        const txRedeem = await createRedeemScript(network, keyPairDave.publicKey, keyPairAlice, alice[1].p2wpkh, secret, secretHash, timeLock, tx, 999e5)
         console.log(`txRedeem=${txRedeem}`)
 
     } else if (process.argv[2] == "refund") {
