@@ -197,7 +197,7 @@ DUP
 GETGLOB 14
 ;; ==
 EQUAL
-THROWIFNOT 109
+THROWIFNOT 108
 ;; emit Redeemed
 NEWC
 PUSHSLICE xc0000000000000000000000002_
@@ -265,7 +265,7 @@ DUP
 GETGLOB 14
 ;; ==
 EQUAL
-THROWIFNOT 109
+THROWIFNOT 108
 ;; emit Redeemed
 NEWC
 PUSHSLICE xc0000000000000000000000002_
@@ -586,130 +586,6 @@ POP s4
 ; end colValue
 ;; returning named params
 ; end function params
-
-.globl	canRedeen
-.public	canRedeen
-.type	canRedeen, @function
-GETGLOB 1
-ISNULL
-PUSHCONT {
-	CALL $c4_to_c7$
-}
-IF
-; Decode input parameters
-; Decode secret
-LDREF
-ENDS
-;; param: secret
-; function canRedeen
-;; return
-;; push identifier now
-NOW
-;; push identifier timeLock
-GETGLOB 12
-;; <
-LESS
-;; short-circuiting &&
-DUP
-PUSHCONT {
-	DROP
-	;; get member balance
-	GETPARAM 7
-	INDEX 0
-	;; push identifier amount
-	GETGLOB 13
-	;; >=
-	GEQ
-	;; short-circuiting &&
-	DUP
-	PUSHCONT {
-		DROP
-		;; push identifier secret
-		DUP
-		CALL $hashSecret_internal$
-		;; push identifier secretHash
-		GETGLOB 14
-		;; ==
-		EQUAL
-	}
-	IF
-}
-IF
-NIP
-;; emitting 1 value(s)
-PUSH S1
-EQINT -1
-PUSHCONT {
-	PUSH S3
-	CTOS
-	LDU 2
-	LDMSGADDR
-	DROP
-	NIP
-	NEWC
-	STSLICECONST xc
-	STSLICE
-	PUSHINT 96
-	STZEROES
-	STSLICECONST 0
-	STSLICECONST 0
-	STSLICECONST x88a7088f
-	PUSH S1
-	STIR 1
-	ENDC
-	PUSHINT 1
-	SENDRAWMSG
-}
-IF
-DROP
-; end function canRedeen
-EQINT -1
-PUSHCONT {
-	CALL $c7_to_c4$
-}
-IF
-TRUE
-SETGLOB 7
-
-.globl	canRedeen_internal
-.type	canRedeen_internal, @function
-;; param: secret
-; function canRedeen
-;; return
-;; push identifier now
-NOW
-;; push identifier timeLock
-GETGLOB 12
-;; <
-LESS
-;; short-circuiting &&
-DUP
-PUSHCONT {
-	DROP
-	;; get member balance
-	GETPARAM 7
-	INDEX 0
-	;; push identifier amount
-	GETGLOB 13
-	;; >=
-	GEQ
-	;; short-circuiting &&
-	DUP
-	PUSHCONT {
-		DROP
-		;; push identifier secret
-		DUP
-		CALL $hashSecret_internal$
-		;; push identifier secretHash
-		GETGLOB 14
-		;; ==
-		EQUAL
-	}
-	IF
-}
-IF
-NIP
-; end function canRedeen
 
 .globl	hashSecret
 .public	hashSecret

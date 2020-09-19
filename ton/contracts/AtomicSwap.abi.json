@@ -43,15 +43,6 @@
 			]
 		},
 		{
-			"name": "canRedeen",
-			"inputs": [
-				{"name":"secret","type":"bytes"}
-			],
-			"outputs": [
-				{"name":"value0","type":"bool"}
-			]
-		},
-		{
 			"name": "hashSecret",
 			"inputs": [
 				{"name":"secret","type":"bytes"}

@@ -6,6 +6,10 @@ import "IAtomicSwap.sol";
 import "IAccept.sol";
 import "AtomicSwapLib.sol";
 
+
+/**
+ * @title      Hashed Timelock Smart Contract for Atomic Swap
+ */
 contract AtomicSwap is IAtomicSwap {
 
     address initiator;
@@ -13,22 +17,45 @@ contract AtomicSwap is IAtomicSwap {
     uint32 timeLock;
     uint128 amount;
 
+    /**
+     * @dev        unique secret hash, part of init_data, so everyone who knows code and secretHash 
+     *             can generate address of this Atomic Swap
+     */
     uint256 public secretHash;
 
     event Redeemed(bytes secret);
 
+    /**
+     * @dev        modifier to accept message from specified address
+     * @param      addr  Expected address
+     */
     modifier only(address addr) {
         require(msg.sender == addr, Errors.ATOMIC_SWAP_NOT_EXPIRED);_;
     }
 
+
+    /**
+     * @dev        modifier that check current time and lock time
+     */
     modifier whenExpired() {
         require(now >= timeLock, Errors.ATOMIC_SWAP_NOT_EXPIRED);_;
     }
 
+    /**
+     * @dev        modifier that check current time and lock time
+     */
     modifier whenNotExpired() {
         require(now < timeLock, Errors.ATOMIC_SWAP_EXPIRED);_;
     }
 
+
+    /**
+     * @dev        constructor for creating Atomic Swap
+     * @param      _initiator    The initiator of Atomic Swap, can refund when lockTime will be expired
+     * @param      _participant  The participant of Atomic Swap, can redeem
+     * @param      _amount       The amount of nanoton to transfer to participant 
+     * @param      _timeLock     The time lock in secs, utc 
+     */
     constructor(
         address _initiator, 
         address _participant, 
@@ -51,6 +78,11 @@ contract AtomicSwap is IAtomicSwap {
         }
     }
 
+    /**
+     * @dev        redeem Atomic Swap by participant before time lock. Emit Redeemed event 
+     *             to reveal secret for initiator. Destruct contract after execution.
+     * @param      secret  The secret
+     */
     function redeem(bytes secret) external override whenNotExpired only(participant) {
         uint256 computed_hash = hashSecret(secret);
         require(computed_hash == secretHash, Errors.SECRET_INVALID);
@@ -60,10 +92,19 @@ contract AtomicSwap is IAtomicSwap {
         selfdestruct(participant);
     }
 
+
+    /**
+     * @dev        refund Atomic Swap by initiator after time lock. Destruct contract after 
+     *             execution.
+     */
     function refund() external override whenExpired only(initiator) {
         selfdestruct(initiator);
     }
 
+
+    /**
+     * @dev        get params to audit this contract
+     */
     function params() public view returns (
         address _initiator,
         address _participant,
@@ -82,12 +123,11 @@ contract AtomicSwap is IAtomicSwap {
         _now = uint32(now);
     }
 
-    function canRedeen(bytes secret) public view returns (bool) {
-        return now < timeLock
-            && address(this).balance >= amount
-            && hashSecret(secret) == secretHash;
-    }
 
+    /**
+     * @dev        helper method to check hash function result, run only local
+     * @param      secret  The secret
+     */
     function hashSecret(bytes secret) public pure returns (uint256) {
         return uint256(sha256(secret));
     }
