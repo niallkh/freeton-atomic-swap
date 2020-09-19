@@ -57,7 +57,7 @@ Bitcoin: bitcoinjs-lib, js
 
 ### WorkFlow
 
-![workflow image](./workdlow.png)
+![workflow image](./workflow.png)
 
 Commands:
 
