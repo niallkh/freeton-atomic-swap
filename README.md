@@ -61,10 +61,10 @@ Bitcoin: bitcoinjs-lib, js
 
 Commands:
 
-* initiate <participant address> <amount> <secret hash> <lock time>
-* participate <initiator address> <amount> <secret hash> <lock time>
-* redeem <contract> <contract transaction> <secret>
-* refund <contract> <contract transaction>
+* initiate (participant address, amount, secret hash, lock time)
+* participate (initiator address, amount, secret hash, lock time)
+* redeem (secret)
+* refund 
 
 Steps:
 
