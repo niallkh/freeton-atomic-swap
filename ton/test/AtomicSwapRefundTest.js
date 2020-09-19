@@ -93,24 +93,7 @@ describe('Atomic Swap Refund', function () {
         const atomicSwapAddress = result['value0']
         expect(atomicSwapAddress).to.be.not.equal(undefined)
         atomicSwapContract = new AtomicSwapContract(client, atomicSwapAddress)
-
-        // Check that participant accepted transfer
-        const messages = (await client.queries.messages.query({
-                src: { eq: participantContract.address },
-                msg_type: { eq: 2 },
-            }, "body"
-        ))
-
-        const events = await Promise.all(messages.map(async msg => await client.contracts.decodeOutputMessageBody({
-            abi: AtomicSwapWalletContract.package.abi,
-            bodyBase64: msg['body'],
-            internal: false,
-        })))
-
-        const onInitiateEvent = events.find(event => event.function == "TransferAccepted")    
-        expect(htoa(onInitiateEvent.output.payload)).to.be.equal("Atomic Swap")     
     })
-
 
     it('wait until Atomic Swap expired', async function() {
         this.timeout(3_500)
@@ -169,14 +152,6 @@ async function getFutureAddress(client, package, keyPair, constructorParams = {}
         constructorParams,
         keyPair,
     })).address
-}
-
-function htoa(hex) {
-    let str = '';
-    for (let i = 0; i < hex.length; i += 2) {
-        str += String.fromCharCode(parseInt(hex.substr(i, 2), 16)); 
-    }
-    return str;
 }
 
 async function delay(time) {

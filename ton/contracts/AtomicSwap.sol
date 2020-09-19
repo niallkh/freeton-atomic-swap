@@ -8,8 +8,6 @@ import "AtomicSwapLib.sol";
 
 contract AtomicSwap is IAtomicSwap {
 
-    bytes constant payload = "Atomic Swap";
-
     address initiator;
     address participant;
     uint32 timeLock;
@@ -47,11 +45,13 @@ contract AtomicSwap is IAtomicSwap {
         amount = _amount;
         timeLock = _timeLock;
 
-        IAccept(participant).acceptTransfer { value: Fees.ATOMIC_SWAP_FWD_ACCEPT, bounce: true, flag: 1 } (payload);
+        uint128 balance = address(this).balance;
+        if (balance > amount) {
+            msg.sender.transfer(balance - amount, true, 0);
+        }
     }
 
     function redeem(bytes secret) external override whenNotExpired only(participant) {
-        require(address(this).balance >= amount, Errors.BALANCE_INSUFFICIENT);
         uint256 computed_hash = hashSecret(secret);
         require(computed_hash == secretHash, Errors.SECRET_INVALID);
     

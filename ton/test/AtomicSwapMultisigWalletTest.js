@@ -99,22 +99,6 @@ describe('Atomic Swap Multisig Wallet Redeem', function () {
         atomicSwapContract = new AtomicSwapContract(client, atomicSwapFutureAddress, initiatorKeyPair);
         await atomicSwapContract.deploy(constructorParams, initParams)
 
-        // Check that participant accepted transfer
-        const messages = (await client.queries.messages.query({
-                src: { eq: participantContract.address },
-                msg_type: { eq: 2 },
-            }, "body"
-        ))
-
-        const events = await Promise.all(messages.map(async msg => await client.contracts.decodeOutputMessageBody({
-            abi: MultisigWalletContract.package.abi,
-            bodyBase64: msg['body'],
-            internal: false,
-        })))
-
-        const onInitiateEvent = events.find(event => event.function == "TransferAccepted")    
-        expect(htoa(onInitiateEvent.output.payload)).to.be.equal("Atomic Swap")
-            
         // Send rest tons  
         await initiatorContract.sendTransaction({ 
             dest: atomicSwapFutureAddress,
@@ -197,12 +181,4 @@ async function getFutureAddress(client, package, keyPair, constructorParams = {}
         keyPair,
         initParams
     })).address
-}
-
-function htoa(hex) {
-    let str = '';
-    for (let i = 0; i < hex.length; i += 2) {
-        str += String.fromCharCode(parseInt(hex.substr(i, 2), 16)); 
-    }
-    return str;
 }

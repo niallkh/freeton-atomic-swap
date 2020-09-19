@@ -112,32 +112,44 @@ DUP
 ; colValue
 SETGLOB 12
 ; end colValue
-;; push identifier participant
-GETGLOB 11
-TRUE
-NEWC
-STSLICECONST x6_
-STI 1
-PUSHINT 3
-STZEROES
-STSLICE
-PUSHSLICE x30f4240000000000000000000000000004_
-STSLICER
-STSLICECONST 0
-;; Remote call IAccept.acceptTransfer
-STSLICECONST 0
-STSLICECONST x5a640cf4
-;; payload
-;; push identifier payload
-PUSHSLICE x41746f6d69632053776170
-NEWC
-STSLICE
-ENDC
-STREFR
-ENDC
-PUSHINT 1
-SENDRAWMSG
-BLKDROP 4
+;; get member balance
+GETPARAM 7
+INDEX 0
+;; decl: balance
+;; if
+;; push identifier balance
+DUP
+;; push identifier amount
+GETGLOB 13
+;; >
+GREATER
+PUSHCONT {
+	;; transfer()
+	;; push identifier balance
+	DUP
+	;; push identifier amount
+	GETGLOB 13
+	;; -
+	SUB
+	UFITS 128
+	;; get member sender
+	GETGLOB 9
+	NEWC
+	STSLICECONST x62_
+	STSLICE
+	SWAP
+	STGRAMS
+	PUSHINT 105
+	STZEROES
+	STSLICECONST 0
+	STSLICECONST 0
+	ENDC
+	PUSHINT 0
+	SENDRAWMSG
+}
+IF
+;; end if
+BLKDROP 5
 ; end constructor AtomicSwap
 CALL $c7_to_c4$
 TRUE
@@ -175,14 +187,6 @@ PUSH S1
 SDEQ
 THROWIFNOT 102
 ; function redeem
-;; get member balance
-GETPARAM 7
-INDEX 0
-;; push identifier amount
-GETGLOB 13
-;; >=
-GEQ
-THROWIFNOT 110
 ;; push identifier secret
 PUSH S1
 CALL $hashSecret_internal$
@@ -251,14 +255,6 @@ PUSH S1
 SDEQ
 THROWIFNOT 102
 ; function redeem
-;; get member balance
-GETPARAM 7
-INDEX 0
-;; push identifier amount
-GETGLOB 13
-;; >=
-GEQ
-THROWIFNOT 110
 ;; push identifier secret
 PUSH S1
 CALL $hashSecret_internal$

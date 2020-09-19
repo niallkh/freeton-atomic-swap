@@ -334,7 +334,7 @@ PUSHCONT {
 	INDEX 0
 	;; push identifier amount
 	PUSH S3
-	PUSHINT 40000000
+	PUSHINT 20000000
 	;; +
 	ADD
 	UFITS 128
@@ -354,7 +354,7 @@ PUSHCONT {
 		CALL $message_balance_macro$
 		;; push identifier amount
 		PUSH S3
-		PUSHINT 40000000
+		PUSHINT 20000000
 		;; +
 		ADD
 		UFITS 128
@@ -405,7 +405,7 @@ HASHCU
 CALL $make_std_address_with_zero_wid_macro$
 ;; push identifier amount
 PUSH S5
-PUSHINT 40000000
+PUSHINT 20000000
 ;; +
 ADD
 UFITS 128
@@ -512,7 +512,7 @@ PUSHCONT {
 	INDEX 0
 	;; push identifier amount
 	PUSH S3
-	PUSHINT 40000000
+	PUSHINT 20000000
 	;; +
 	ADD
 	UFITS 128
@@ -532,7 +532,7 @@ PUSHCONT {
 		CALL $message_balance_macro$
 		;; push identifier amount
 		PUSH S3
-		PUSHINT 40000000
+		PUSHINT 20000000
 		;; +
 		ADD
 		UFITS 128
@@ -583,7 +583,7 @@ HASHCU
 CALL $make_std_address_with_zero_wid_macro$
 ;; push identifier amount
 PUSH S5
-PUSHINT 40000000
+PUSHINT 20000000
 ;; +
 ADD
 UFITS 128
