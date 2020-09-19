@@ -1,7 +1,6 @@
 {
   "name": "freeton-atomic-swap",
   "version": "1.0.0",
-  "description": "restrictions: 1. Users should have own wallets on ton and eth.",
   "main": "./app/app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -11,7 +10,7 @@
     "url": "git+https://github.com/nailkhaf/freeton-atomic-swap.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "Nail Khafizov <854297992c@gmail.com>",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/nailkhaf/freeton-atomic-swap/issues"

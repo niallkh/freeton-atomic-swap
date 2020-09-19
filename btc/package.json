@@ -1,13 +1,12 @@
 {
   "name": "freeton-atomic-swap-btc",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "Nail Khafizov <854297992c@gmail.com>",
   "license": "ISC",
   "dependencies": {
     "bitcoinjs-lib": "^5.2.0",

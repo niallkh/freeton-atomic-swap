@@ -11,14 +11,19 @@ Implementation and demonstration smart contracts of Atomic Swaps:
 ### Author
 
 Nail Khafizov, independent software developer.
-https://t.me/nailkhaf
+
+[telegram](https://t.me/nailkhaf)
+
 854297992c@gmail.com
 
 ### Repository structure
 
-`./ton` - Atomic Swap Contracts for FreeTon blockchain
-`./eth` - Atomic Swap Contracts for Ethereum blockchain
-`./btc` - Atomic Swap Contracts for Bitcoin blockchain
+[`./ton`](https://github.com/nailkhaf/freeton-atomic-swap/tree/master/ton) - Atomic Swap Contracts for FreeTon blockchain
+
+[`./eth`](https://github.com/nailkhaf/freeton-atomic-swap/tree/master/eth) - Atomic Swap Contracts for Ethereum blockchain
+
+[`./btc`](https://github.com/nailkhaf/freeton-atomic-swap/tree/master/ton) - Atomic Swap Contracts for Bitcoin blockchain
+
 `./app` - App for demostrating working of Smart Contracts at testnets. Not use in production, only for learning purpose
 
 ### Motivation
@@ -45,16 +50,21 @@ I choose first way, because the time of contest is limited to three weeks and hi
 ### Tech Stack
 
 FreeTon: TON-Solidity-Compiler, Solidity, js for testing
+
 Ethereum: Truffle, Solidity, js for testing
+
 Bitcoin: bitcoinjs-lib, js
 
 ### WorkFlow
 
+![workflow image](./workdlow.png)
+
 Commands:
-  initiate <participant address> <amount> <secret hash> <lock time>
-  participate <initiator address> <amount> <secret hash> <lock time>
-  redeem <contract> <contract transaction> <secret>
-  refund <contract> <contract transaction>
+
+* initiate <participant address> <amount> <secret hash> <lock time>
+* participate <initiator address> <amount> <secret hash> <lock time>
+* redeem <contract> <contract transaction> <secret>
+* refund <contract> <contract transaction>
 
 Steps:
 
@@ -71,5 +81,7 @@ The most part of steps can be automated by wallet, with the exception of exchang
 ### References
 
 https://www.investopedia.com/terms/a/atomic-swaps.asp
+
 https://github.com/decred/atomicswap
+
 https://medium.com/summa-technology/cross-chain-auction-technical-f16710bfe69f

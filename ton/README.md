@@ -2,28 +2,32 @@
 
 ### Source code
 
-`./contracts/AtomicSwap.sol` - Atomic Swap Smart Contract
+`./contracts/AtomicSwap.sol` - [Atomic Swap Smart Contract](https://github.com/nailkhaf/freeton-atomic-swap/blob/master/ton/contracts/AtomicSwap.sol)
 
 ### Commands
 
-`npm test` - run tests. 
-
-Require running [tondev](https://github.com/tonlabs/ton-dev-cli) docker instance.
+`npm test` - run tests. Require running [tondev](https://github.com/tonlabs/ton-dev-cli) docker instance.
 
 `npm run build` - compile solidity smart contracts and generate js wrappers.
 
-Require:
-* [`TON-Solidity-Compiler`](https://github.com/tonlabs/TON-Solidity-Compiler/)
+Requirements:
+* [TON-Solidity-Compiler](https://github.com/tonlabs/TON-Solidity-Compiler/)
 * [TVM-linker](https://github.com/tonlabs/TVM-linker)
 * [ton-dev-cli](https://github.com/tonlabs/ton-dev-cli)
 
 ### Tests
 
-`./test/AtomicSwapMultisigWalletTest.js` - Testing Atomic Swap case without `AtomicSwapWallet`, using only `SetcodeMultisigWallet` from Surf. Deploy Atomic Swap by external message.
+* [`./test/AtomicSwapMultisigWalletTest.js`](https://github.com/nailkhaf/freeton-atomic-swap/blob/master/ton/test/AtomicSwapMultisigWalletTest.js)
 
-`./test/AtomicSwapTest.js` - Testing standard Atomic Swap case, transfering ton crystals from one `AtomicSwapWallet` and redeem by another `AtomicSwapWallet`. 
+Testing Atomic Swap case without `AtomicSwapWallet`, using only `SetcodeMultisigWallet` from Surf. Deploy Atomic Swap by external message.
 
-`./test/AtomicSwapRefundTest.js` - Testing `refund` Atomic Swap case.
+* [`./test/AtomicSwapTest.js`](https://github.com/nailkhaf/freeton-atomic-swap/blob/master/ton/test/AtomicSwapTest.js)
+ 
+Testing standard Atomic Swap case, transfering ton crystals from one `AtomicSwapWallet` and redeem by another `AtomicSwapWallet`. 
+
+* [`./test/AtomicSwapRefundTest.js`](https://github.com/nailkhaf/freeton-atomic-swap/blob/master/ton/test/AtomicSwapRefundTest.js) 
+ 
+Testing `refund` Atomic Swap case.
 
 ### Specification
 

@@ -1,7 +1,6 @@
 {
   "name": "freeton-atomic-swap-eth",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "truffle test",
@@ -9,8 +8,7 @@
     "deploy": "truffle migrate",
     "deploy-ropsten": "truffle migrate --network ropsten"
   },
-  "keywords": [],
-  "author": "",
+  "author": "Nail Khafizov <854297992c@gmail.com>",
   "license": "ISC",
   "dependencies": {
     "@truffle/hdwallet-provider": "^1.0.44",
