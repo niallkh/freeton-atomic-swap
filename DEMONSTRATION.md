@@ -18,7 +18,7 @@ Ethereum:
 
 Bitcoin:
 * Testnet
-* [Bitcoin testnet explorer](https://live.blockcypher.com/btc-testnet/)
+* [Bitcoin testnet explorer](https://blockstream.info/testnet/)
 * [Bitcoin-core](https://bitcoin.org/en/bitcoin-core/)
 * Wallet with bitcoins
 

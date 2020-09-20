@@ -7,7 +7,9 @@ const { getKeys, btcNetwork } = require('./btc-utils.js')
 const bitcoin = require('bitcoinjs-lib')
 
 async function getWallet() {
-    return await getKeys()
+    const keys = await getKeys()
+    keys.privateKey = undefined
+    return keys
 }
 
 async function createAtomicSwapBtc(participant, timeLock, secretHash) {

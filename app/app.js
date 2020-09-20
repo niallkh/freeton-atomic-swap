@@ -255,7 +255,7 @@ btcCmd.command('get-wallet')
     })
 
 btcCmd.command('initiate <participant> [timeSec]')
-    .description('generate address of AtomicSwap')
+    .description('generate p2sh address of AtomicSwap')
     .action(async (participant, time) => {
         await handleAction(async () => {
             const lockTime = time ? parseInt(time) : parseInt(process.env.DEFAULT_LOCK_TIME)
@@ -268,7 +268,7 @@ btcCmd.command('initiate <participant> [timeSec]')
     })
 
 btcCmd.command('participate <participant> <secret-hash> [timeSec]')
-    .description('generate address of AtomicSwap')
+    .description('generate p2sh address of AtomicSwap')
     .action(async (participant, secretHash, time) => {
         await handleAction(async () => {
             const lockTime = time ? parseInt(time) : parseInt(process.env.DEFAULT_LOCK_TIME)
@@ -281,7 +281,7 @@ btcCmd.command('participate <participant> <secret-hash> [timeSec]')
     })
 
 btcCmd.command('verify <initiator> <secret-hash> <p2sh-address> <time-lock>')
-    .description('generate address of AtomicSwap')
+    .description('verify address of AtomicSwap')
     .action(async (initiator, secretHash, p2shAddress, timeLock) => {
         await handleAction(async () => {
 
