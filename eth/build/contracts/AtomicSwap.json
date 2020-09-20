@@ -12982,6 +12982,45 @@
     "version": "0.5.16+commit.9c3226ce.Emscripten.clang"
   },
   "networks": {
+    "3": {
+      "events": {
+        "0xa9403cc4309611510bc74ba260049c320832f45974a8cf1d5dcb30b2df4c8e53": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "secretHash",
+              "type": "uint256"
+            }
+          ],
+          "name": "AtomicSwapCreated",
+          "type": "event"
+        },
+        "0x0f021f85353a008a4d411bd4b05d36ae185a53da48a83b655e8bcf15b04a8867": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "secretHash",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "bytes",
+              "name": "secret",
+              "type": "bytes"
+            }
+          ],
+          "name": "Redeemed",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0xE33fEB9e481B45e2DD45Ed7C4B038929dBCd3eB1",
+      "transactionHash": "0xa48887cdbc783c8230e708f8fa7726eccc6d806775dd8841a156fd2d87a620a1"
+    },
     "5777": {
       "events": {
         "0xa9403cc4309611510bc74ba260049c320832f45974a8cf1d5dcb30b2df4c8e53": {
@@ -13050,7 +13089,8 @@
     }
   },
   "schemaVersion": "3.2.4",
-  "updatedAt": "2020-09-17T16:31:47.830Z",
+  "updatedAt": "2020-09-17T19:00:05.926Z",
+  "networkType": "ethereum",
   "devdoc": {
     "methods": {}
   },

@@ -17,21 +17,21 @@ Requirements:
 
 ### Tests
 
+Testing Atomic Swap case without `AtomicSwapWallet`, using only `SetcodeMultisigWallet` from Surf. Deploy Atomic Swap by external message.
+
 * [`./test/AtomicSwapMultisigWalletTest.js`](https://github.com/nailkhaf/freeton-atomic-swap/blob/master/ton/test/AtomicSwapMultisigWalletTest.js)
 
-Testing Atomic Swap case without `AtomicSwapWallet`, using only `SetcodeMultisigWallet` from Surf. Deploy Atomic Swap by external message.
+Testing standard Atomic Swap case, transfering ton crystals from one `AtomicSwapWallet` and redeem by another `AtomicSwapWallet`. 
 
 * [`./test/AtomicSwapTest.js`](https://github.com/nailkhaf/freeton-atomic-swap/blob/master/ton/test/AtomicSwapTest.js)
  
-Testing standard Atomic Swap case, transfering ton crystals from one `AtomicSwapWallet` and redeem by another `AtomicSwapWallet`. 
+Testing `refund` Atomic Swap case.
 
 * [`./test/AtomicSwapRefundTest.js`](https://github.com/nailkhaf/freeton-atomic-swap/blob/master/ton/test/AtomicSwapRefundTest.js) 
  
-Testing `refund` Atomic Swap case.
+### Specification AtomicSwap.sol
 
-### Specification
-
-This contract is example of Hashed TimeLock Contract. Lock ton crystals until lock time or redeem by secret. 
+This contract implements Hashed TimeLock Contract. Lock ton crystals until lock time or redeem by secret. 
 
 `contract AtomicSwap`
 
@@ -43,6 +43,10 @@ Redeem Atomic Swap by participant before time lock. Emit `Redeemed` event to rev
 
 `function redeem(bytes secret) external;`
 
-Refund Atomic Swap by initiator after time lock. Sender must be initiator Destruct contract after execution.
+Refund Atomic Swap by initiator after time lock. Sender must be initiator. Destruct contract after execution.
 
 `function refund() external;`
+
+Fetch params of Atomic Swap to verify it.
+
+`function params() public view returns (address initiator, address participant, uint32 timeLock, uint32 now, uint256 secretHash, uint128 amount, uint256 balance)`

@@ -12,7 +12,7 @@ Implementation and demonstration smart contracts of Atomic Swaps:
 
 Nail Khafizov, independent software developer.
 
-[telegram](https://t.me/nailkhaf)
+t.me/nailkhaf
 
 854297992c@gmail.com
 
