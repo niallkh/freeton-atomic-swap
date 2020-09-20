@@ -45,7 +45,7 @@ I chose **HTLC**, because:
 ### Tech Stack
 **FreeTon**: `TON-Solidity-Compiler`, `Solidity`, `JS` for testing  
 **Ethereum**: `Truffle`, `Solidity`, `JS` for testing  
-**Bitcoin**: `bitcoinjs-lib`, `JS`
+**Bitcoin (Work in progress)**: `bitcoinjs-lib`, `JS`
 
 ### Repository structure
 [`./ton`](https://github.com/nailkhaf/freeton-atomic-swap/tree/master/ton) - Atomic Swap Contracts for FreeTon blockchain  
