@@ -20,7 +20,7 @@ library Errors {
  * @title      predefined fee for operations
  */
 library Fees {
-    uint128 constant ATOMIC_SWAP_CREATE = 30 milliton;
+    uint128 constant ATOMIC_SWAP_CREATE = 10 milliton;
 }
 
 /**

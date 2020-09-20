@@ -4,7 +4,7 @@ const util = require('util')
 
 const readAsync = util.promisify(fs.readFile)
 
-const ATOMIC_SWAP_ABI = "eth/contracts/build/AtomicSwap.json"
+const ATOMIC_SWAP_ABI = "eth/build/contracts/AtomicSwap.json"
 
 module.exports = {
     atomicSwapAddress: atomicSwapAddress.address,

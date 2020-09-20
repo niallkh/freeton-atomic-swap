@@ -116,9 +116,11 @@ async function getAtomicSwapSecret(secretHash) {
         const account = accounts[0]
 
         const events = await atomicSwap.getPastEvents('Redeemed', { fromBlock: 0, toBlock: 'latest' })
-        console.log(`${JSON.stringify(events, null, 2)}`)
 
-        const event = events.find(event => event.returnValues.secretHash == `0x${secretHash}`)
+        let event
+        if (events.length > 0) {
+            event = events[events.length - 1]
+        }
 
         return event ? event.returnValues.secret : 'Not found'
     })    

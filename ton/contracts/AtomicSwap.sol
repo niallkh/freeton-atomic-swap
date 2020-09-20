@@ -71,11 +71,6 @@ contract AtomicSwap is IAtomicSwap {
         participant = _participant;
         amount = _amount;
         timeLock = _timeLock;
-
-        uint128 balance = address(this).balance;
-        if (balance > amount) {
-            msg.sender.transfer(balance - amount, true, 0);
-        }
     }
 
     /**

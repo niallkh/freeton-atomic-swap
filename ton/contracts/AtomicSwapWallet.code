@@ -307,7 +307,7 @@ GETPARAM 7
 INDEX 0
 ;; push identifier amount
 PUSH S3
-PUSHINT 30000000
+PUSHINT 10000000
 ;; +
 ADD
 UFITS 128
@@ -349,7 +349,7 @@ HASHCU
 CALL $make_std_address_with_zero_wid_macro$
 ;; push identifier amount
 PUSH S5
-PUSHINT 30000000
+PUSHINT 10000000
 ;; +
 ADD
 UFITS 128
@@ -455,7 +455,7 @@ GETPARAM 7
 INDEX 0
 ;; push identifier amount
 PUSH S3
-PUSHINT 30000000
+PUSHINT 10000000
 ;; +
 ADD
 UFITS 128
@@ -497,7 +497,7 @@ HASHCU
 CALL $make_std_address_with_zero_wid_macro$
 ;; push identifier amount
 PUSH S5
-PUSHINT 30000000
+PUSHINT 10000000
 ;; +
 ADD
 UFITS 128

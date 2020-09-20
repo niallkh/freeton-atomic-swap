@@ -44,7 +44,7 @@ tonCmd.command('balance')
     })
 
 tonCmd.command('giver <address> <tons>')
-    .description('deploy Atomic Swap Wallet')
+    .description('get grams from giver, works onlu with running tondev-cli')
     .action(async (address, tons) => {
         await handleAction(async () => {
             await ton.sendGramsFromGiver(address, parseInt(tons) * parseInt(process.env.ONE_TONE))
@@ -157,7 +157,7 @@ ethCmd.command('balance')
     .action(async () => {
         await handleAction(async () => {
             const balance = await eth.getWalletBalance()
-            console.log(`Wallet address:\n${JSON.stringify(balance, null, 2)}`)
+            console.log(`Wallet balance:\n${JSON.stringify(balance, null, 2)}`)
         })
     })
 
