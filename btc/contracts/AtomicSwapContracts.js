@@ -1,5 +1,15 @@
 const bitcoin = require('bitcoinjs-lib')
-    
+ 
+
+/**
+ * Creates an atomic swap contract using Bitcoin Script.
+ *
+ * @param      secretHash         The secret hash
+ * @param      initiatorPubKey    The initiator pub key
+ * @param      participantPubKey  The participant pub key
+ * @param      lockTime           The lock time
+ * @return     hex of Atomic Swap Smart Contract 
+ */
 function createAtomicSwapScript(secretHash, initiatorPubKey, participantPubKey, lockTime) {
     return bitcoin.script.fromASM(
         `
@@ -33,6 +43,14 @@ function createAtomicSwapScript(secretHash, initiatorPubKey, participantPubKey, 
     )
 }
 
+/**
+ * Creates an atomic swap redeem script. Can be used together with #createAtomicSwapScript.
+ *
+ * @param      signature          The signature
+ * @param      participantPubKey  The participant pub key
+ * @param      secret             The secret
+ * @return     hex of Atomic Swap Redeem Smart Contract 
+ */
 function createAtomicSwapRedeemScript(signature, participantPubKey, secret) {
     return bitcoin.script.fromASM(
         `
@@ -46,6 +64,13 @@ function createAtomicSwapRedeemScript(signature, participantPubKey, secret) {
     )
 }
 
+/**
+ * Creates an atomic swap redeem script. Can be used together with #createAtomicSwapScript.
+ *
+ * @param      signature        The signature
+ * @param      initiatorPubKey  The initiator pub key
+ * @return     hex of Atomic Swap Refund Smart Contract
+ */
 function createAtomicSwapRefundScript(signature, initiatorPubKey) {
     return bitcoin.script.fromASM(
         `

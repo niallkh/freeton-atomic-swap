@@ -1,5 +1,5 @@
 const bitcoin = require('bitcoinjs-lib')
-const { alice, bob, dave } = require('./wallets.json')
+const { alice, dave } = require('./wallets.json')
 const giver = dave
 const network = bitcoin.networks.regtest
 const bip65 = require('bip65')
@@ -17,7 +17,6 @@ const readAsync = util.promisify(fs.readFile);
 const writeAsync = util.promisify(fs.writeFile);
 
 const keyPairDave = bitcoin.ECPair.fromWIF(dave[1].wif, network)
-const keyPairBob = bitcoin.ECPair.fromWIF(bob[1].wif, network)
 const keyPairAlice = bitcoin.ECPair.fromWIF(alice[1].wif, network)
 
 
